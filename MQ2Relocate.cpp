@@ -19,7 +19,7 @@ Usage:
 
 Changelog:
 	10/30/2019 - Submitted Plugin
-	10/31/2019 - Updated to CWTN Commons change
+	10/31/2019 - Updated w/ CWTN Common changes - Added Component Check to Binden POK item -
 **/
 #include "../MQ2Plugin.h"
 #define COMMONS
@@ -27,8 +27,7 @@ Changelog:
 #include "../CWTNCommons/UtilityFunctions.h"
 
 PreSetup("MQ2Relocate");
-float VERSION = 1.0f;
-PLUGIN_VERSION(VERSION);
+PLUGIN_VERSION(1.0f);
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine);
 bool HaveAlias(PCHAR ShortCommand);
@@ -45,7 +44,7 @@ bool canOriginAA = false;
 
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
-	if (!InGame()) 
+	if (!InGame())
 		return;
 	//Get our parameters
 	CHAR Arg[MAX_STRING] = { 0 };
@@ -200,10 +199,10 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			else if (FindItemByName("Brick of Knowledge") && IsClickyReadyByItemName("Brick of Knowledge")) {
 				sprintf_s(reloClicky, "Brick of Knowledge");
 			}
-			else if (FindItemByName("The Binden Concerrentia") && IsClickyReadyByItemName("The Binden Concerrentia")) {
+			else if (FindItemByName("The Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge", 1) && IsClickyReadyByItemName("The Binden Concerrentia")) {
 				sprintf_s(reloClicky, "The Binden Concerrentia");
 			}
-			else if (FindItemByName("The Fabled Binden Concerrentia") && IsClickyReadyByItemName("The Fabled Binden Concerrentia")) {
+			else if (FindItemByName("The Fabled Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge", 1) && IsClickyReadyByItemName("The Fabled Binden Concerrentia")) {
 				sprintf_s(reloClicky, "The Fabled Binden Concerrentia");
 			}
 			else {
@@ -258,7 +257,7 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0 && !AltAbilityReady("Origin")) {
 					WriteChatf("\ayOrigin \arisn't ready right now\aw.");
 				}
-				else if (FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
+				else if ((GetCharInfo2()->BoundLocations[1].ZoneBoundID == 394) && FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 					UseClickyByItemName("Sceptre of Draconic Calling");
 					return; // returning here since we don't care about the !canOriginAA check
 				}
@@ -393,7 +392,7 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				return;
 			}
 		}
-	} 
+	}
 	WriteChatf("\arYou didn't provide a valid option for /relocate.\aw");
 	WriteChatf("\arPlease do \"/relocate help\" for more information.\aw");
 }
@@ -411,7 +410,8 @@ bool HaveAlias(PCHAR ShortCommand) {
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	PulseDelay = 75;
+	VERSION = 1.0f;
+	iPulseDelay = 75;
 	if ((HaveAlias("/relo")) || (HaveAlias("/relocate"))) { //check our aliases
 		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
@@ -432,8 +432,8 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 // This is called every time MQ pulses (MainLOOP!)
 PLUGIN_API VOID OnPulse(VOID)
 {
-	if (++Pulse < PulseDelay) return;
-	Pulse = 0;
+	if (++iPulse < iPulseDelay) return;
+	iPulse = 0;
 	//Base Cases
 	if (!InGame()) {
 		return;
@@ -488,7 +488,7 @@ bool UseClickyByItemName(PCHAR szItem) {
 	if (FindItemCountByName(szItem)) {
 		if (PCONTENTS item = FindItemByName(szItem)) {
 			if (PITEMINFO pIteminf = GetItemFromContents(item)) {
-				if ((PVOID)& GetItemFromContents(item)->Clicky) {
+				if ((PVOID)&GetItemFromContents(item)->Clicky) {
 					if (pSpellMgr && ItemReady(pIteminf->Name)) {
 						UseItem(pIteminf->Name);
 						return true;
@@ -504,7 +504,7 @@ bool IsClickyReadyByItemName(PCHAR szItem) {
 	if (FindItemCountByName(szItem)) {
 		if (PCONTENTS item = FindItemByName(szItem)) {
 			if (PITEMINFO pIteminf = GetItemFromContents(item)) {
-				if ((PVOID)& GetItemFromContents(item)->Clicky) {
+				if ((PVOID)&GetItemFromContents(item)->Clicky) {
 					if (pSpellMgr && ItemReady(pIteminf->Name)) {
 						return true;
 					}
