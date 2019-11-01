@@ -19,6 +19,7 @@ Usage:
 
 Changelog:
 	10/30/2019 - Submitted Plugin
+	10/31/2019 - Updated to CWTN Commons change
 **/
 #include "../MQ2Plugin.h"
 #define COMMONS
