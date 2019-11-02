@@ -257,7 +257,7 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0 && !AltAbilityReady("Origin")) {
 					WriteChatf("\ayOrigin \arisn't ready right now\aw.");
 				}
-				else if ((GetCharInfo2()->BoundLocations[1].ZoneBoundID == 394) && FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
+				else if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 					UseClickyByItemName("Sceptre of Draconic Calling");
 					return; // returning here since we don't care about the !canOriginAA check
 				}
