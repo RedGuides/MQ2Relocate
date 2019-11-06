@@ -18,19 +18,17 @@ Usage:
 		/relocate fellow - uses your fellowship insignia
 
 Changelog:
-	10/30/2019 - Submitted Plugin
-	10/31/2019 - Updated w/ CWTN Common changes - Added Component Check to Binden POK item -
-	11/05/2019 - Updates to add lobby, blood, evac, teleport, and translocate to /relocate
-				 Updates to add /translocate with current target or name
+	10/30/2019 - V1.0 - Submitted Plugin
+	10/31/2019 - V1.1 - Updated w/ CWTN Common changes - Added Component Check to Binden POK item -
+	11/05/2019 - V1.2 - Updates to add lobby, blood, evac, teleport, and translocate to /relocate
+						Updates to add /translocate with current target or name
 	
 **/
 #include "../MQ2Plugin.h"
 #include "../CWTNCommons/UtilityFunctions.h"
-#include <algorithm>
-
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.0f);
+PLUGIN_VERSION(1.2f);
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine);
 void TransloCmd(PSPAWNINFO pChar, PCHAR szLine);
