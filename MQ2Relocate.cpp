@@ -22,13 +22,14 @@ Changelog:
 	10/31/2019 - V1.1 - Updated w/ CWTN Common changes - Added Component Check to Binden POK item -
 	11/05/2019 - V1.2 - Updates to add lobby, blood, evac, teleport, and translocate to /relocate
 						Updates to add /translocate with current target or name
+	11/15/2019 - V1.3 - Updated /relocate fellowship to make you visible before you click fellowship insignia
 	
 **/
 #include "../MQ2Plugin.h"
 #include "../CWTNCommons/UtilityFunctions.h"
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.2f);
+PLUGIN_VERSION(1.3f);
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine);
 void TransloCmd(PSPAWNINFO pChar, PCHAR szLine);
@@ -365,6 +366,9 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) { // Use fellowship Insignia
 			if (FindItemByName("Fellowship Registration Insignia") && IsClickyReadyByItemName("Fellowship Registration Insignia")) {
+				if (pChar->HideMode) { // fellowship insignia requires being visible to use
+					MakeMeVisible(NULL, NULL);
+				}
 				if (pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire) {
 					UseClickyByItemName("Fellowship Registration Insignia");
 					return;
@@ -604,7 +608,7 @@ bool HaveAlias(PCHAR ShortCommand) {
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	VERSION = 1.0f;
+	VERSION = 1.3f;
 	iPulseDelay = 75;
 	if ((HaveAlias("/relo")) || (HaveAlias("/relocate"))) { //check our aliases
 		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
