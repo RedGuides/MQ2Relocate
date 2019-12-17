@@ -26,7 +26,7 @@ Changelog:
 	
 **/
 #include "../MQ2Plugin.h"
-#include "../CWTNCommons/UtilityFunctions.h"
+#include "../CWTN/CWTNCommons/UtilityFunctions.h"
 
 PreSetup("MQ2Relocate");
 PLUGIN_VERSION(1.3f);
