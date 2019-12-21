@@ -23,13 +23,14 @@ Changelog:
 	11/05/2019 - V1.2 - Updates to add lobby, blood, evac, teleport, and translocate to /relocate
 						Updates to add /translocate with current target or name
 	11/15/2019 - V1.3 - Updated /relocate fellowship to make you visible before you click fellowship insignia
-	
+	12/20/2019 - V1.4 - Updated /relocate crystal for ToV pre-order item "Froststone Crystal Resonator"
+					  - Updated the single use items to use a function with cleaner functionality
 **/
 #include "../MQ2Plugin.h"
 #include "../CWTN/CWTNCommons/UtilityFunctions.h"
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.3f);
+PLUGIN_VERSION(1.4);
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine);
 void TransloCmd(PSPAWNINFO pChar, PCHAR szLine);
@@ -37,6 +38,7 @@ bool HaveAlias(PCHAR ShortCommand);
 bool UseClickyByItemName(PCHAR szItem);
 bool IsClickyReadyByItemName(PCHAR szItem);
 bool IsTargetPlayer(PCHAR szItem);
+void StatusItemCheck(char* itemname);
 
 char convertoption[MAX_STRING] = { 0 };
 char reloClicky[128] = { 0 };
@@ -76,6 +78,7 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			WriteChatf("/relocate \agfellow\aw or \agfellowship\aw to use your \ayFellowship Insignia\aw.");
 			WriteChatf("/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.");
 			WriteChatf("/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
+			WriteChatf("/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
 			WriteChatf("/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.");
 			WriteChatf("/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.");
 			WriteChatf("\agValid Translocate options are:\aw");
@@ -265,157 +268,104 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			return;
 		}
 		if (!_stricmp(Arg, "origin")) { //try and use Origin AA, otherwise try and use Sceptre of Draconic Calling
-			if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0 && AltAbilityReady("Origin")) { // added the AltAbilityCheck because we don't want to canOriginAA if it it not ready
-				canOriginAA = true;
-				return;
-			}
-			else {
-				if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0 && !AltAbilityReady("Origin")) {
+			if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0){
+				if (AltAbilityReady("Origin")) { 
+					canOriginAA = true;
+				}
+				else {
 					WriteChatf("\ayOrigin \arisn't ready right now\aw.");
 				}
-				else if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
-					UseClickyByItemName("Sceptre of Draconic Calling");
-					return; // returning here since we don't care about the !canOriginAA check
+				if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
+					if (IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
+						UseClickyByItemName("Sceptre of Draconic Calling");
+					}
+					else {
+						WriteChatf("\aySceptre of Draconic Calling \arisn't ready right now\aw!");
+					}
 				}
-				else if (!AltAbility("Origin") || AltAbility("Origin")->CurrentRank == 0) {
-					WriteChatf("\arI don't have the \ayOrigin \arAA\aw!");
-					return;
-				}
-				if (!FindItemByName("Sceptre of Draconic Calling")) {
-					WriteChatf("\arI don't have a \aySceptre of Draconic Calling\aw.");
-				}
-				else if (FindItemByName("Sceptre of Draconic Calling") && IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
-					WriteChatf("\aySceptre of Draconic Calling \arisn't ready right now\aw!");
-				}
+			}
+			else {
 				WriteChatf("\arWe don't have a way to Origin at the moment\ar.");
 			}
 			return;
 		}
 		if (!_stricmp(Arg, "brell")) { // Mark of Brell for Brell's Rest
-			if (FindItemByName("Mark of Brell") && IsClickyReadyByItemName("Mark of Brell")) {
-				UseClickyByItemName("Mark of Brell");
-				return;
-			}
-			if (!FindItemByName("Mark of Brell")) {
-				WriteChatf("\arYou do not have a \ayMark of Brell\aw!");
-				return;
-			}
-			if (FindItemByName("Mark of Brell") && !IsClickyReadyByItemName("Mark of Brell")) {
-				WriteChatf("\ayMark of Brell \aris not ready\aw!");
-				return;
-			}
+			StatusItemCheck("Mark of Brell");
+			return;
 		}
 		if (!_stricmp(Arg, "anchor")) { // Use Primary or Secondary Anchor
-			if (FindItemByName("Primary Anchor Transport Device") && IsClickyReadyByItemName("Primary Anchor Transport Device")) {
-				sprintf_s(reloClicky, "Primary Anchor Transport Device");
+			if (FindItemByName("Primary Anchor Transport Device")) {
+				if (IsClickyReadyByItemName("Primary Anchor Transport Device")) {
+					sprintf_s(reloClicky, "Primary Anchor Transport Device");
+					UseClickyByItemName(reloClicky);
+				}
 			}
-			else if (FindItemByName("Secondary Anchor Transport Device") && IsClickyReadyByItemName("Secondary Anchor Transport Device")) {
-				sprintf_s(reloClicky, "Secondary Anchor Transport Device");
-			}
-			else {
-				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
-				return;
-			}
-			if (FindItemByName(reloClicky)) {
-				if (UseClickyByItemName(reloClicky)) {
+			else if (FindItemByName("Secondary Anchor Transport Device")) {
+				if (IsClickyReadyByItemName("Secondary Anchor Transport Device")) {
+					sprintf_s(reloClicky, "Secondary Anchor Transport Device");
+					UseClickyByItemName(reloClicky);
 				}
 			}
 			else {
-				//This else for error checking and should never happen.
-				WriteChatf("I don't have a %s", reloClicky);
+				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
 			}
 			return;
 		}
 		if (!_stricmp(Arg, "anchor1")) { // Use specifically Primary Anchor
-			if (FindItemByName("Primary Anchor Transport Device") && IsClickyReadyByItemName("Primary Anchor Transport Device")) {
-				sprintf_s(reloClicky, "Primary Anchor Transport Device");
-			}
-			else {
-				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
-				return;
-			}
-			if (FindItemByName(reloClicky)) {
-				if (UseClickyByItemName(reloClicky)) {
-					//WriteChatf("Casting \ag %s \aw ", reloClicky);
-				}
-			}
-			else {
-				//This else for error checking and should never happen.
-				WriteChatf("I don't have a %s", reloClicky);
-			}
+			StatusItemCheck("Primary Anchor Transport Device");
 			return;
 		}
 		if (!_stricmp(Arg, "anchor2")) { // use specifically Secondary Anchor
-			if (FindItemByName("Secondary Anchor Transport Device") && IsClickyReadyByItemName("Secondary Anchor Transport Device")) {
-				sprintf_s(reloClicky, "Secondary Anchor Transport Device");
-			}
-			else {
-				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
-				return;
-			}
-			if (FindItemByName(reloClicky)) {
-				if (UseClickyByItemName(reloClicky)) {
-					//WriteChatf("Casting \ag %s \aw ", reloClicky);
-				}
-			}
-			else {
-				//This else for error checking and should never happen.
-				WriteChatf("I don't have a %s", reloClicky);
-			}
+			StatusItemCheck("Secondary Anchor Transport Device");
 			return;
 		}
 		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) { // Use fellowship Insignia
-			if (FindItemByName("Fellowship Registration Insignia") && IsClickyReadyByItemName("Fellowship Registration Insignia")) {
-				if (pChar->HideMode) { // fellowship insignia requires being visible to use
-					MakeMeVisible(NULL, NULL);
-				}
-				if (pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire) {
-					UseClickyByItemName("Fellowship Registration Insignia");
-					return;
-				}
-				else {
-					if (!(pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire)) {
-						WriteChatf("\arYou do not have a campfire up\aw.");
-						return;
+			if (FindItemByName("Fellowship Registration Insignia")) {
+				if (IsClickyReadyByItemName("Fellowship Registration Insignia")) {
+					if (pChar->HideMode) { // fellowship insignia requires being visible to use
+						MakeMeVisible(GetCharInfo()->pSpawn, "");
+					}
+					if (pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire) {
+						UseClickyByItemName("Fellowship Registration Insignia");
+					}
+					else {
+							WriteChatf("\arYou do not have a campfire up\aw.");
 					}
 				}
-			}
-			if (!FindItemByName("Fellowship Registration Insignia")) {
-				WriteChatf("\arYou do not have a Fellowship Registration Insigna!\aw");
-				return;
-			}
-			if (FindItemByName("Fellowship Registration Insignia") && !IsClickyReadyByItemName("Fellowship Registration Insignia")) {
-				WriteChatf("\arFellowship Registration Insignia is not ready!\aw");
-				return;
-			}
-		}
-		if (!_stricmp(Arg, "lobby")) {
-			if (AltAbility("Throne of Heroes") && AltAbility("Throne of Heroes")->CurrentRank > 0 && AltAbilityReady("Throne of Heroes")) {
-				canLobbyAA = true;
-				return;
+				else {
+					WriteChatf("\arFellowship Registration Insignia is not ready!\aw");
+				}
 			}
 			else {
-				if (AltAbility("Throne of Heroes") && AltAbility("Throne of Heroes")->CurrentRank > 0 && !AltAbilityReady("Throne of Heroes")) {
+				WriteChatf("\arYou do not have a Fellowship Registration Insigna!\aw");
+			}
+			return;
+		}
+		if (!_stricmp(Arg, "lobby")) {
+			if (AltAbility("Throne of Heroes") && AltAbility("Throne of Heroes")->CurrentRank > 0) {
+				if (AltAbilityReady("Throne of Heroes")) {
+					canLobbyAA = true;
+				}
+				else {
 					WriteChatf("\ayThrone of Heroes \arisn't ready right now\aw.");
 				}
-				else if (!AltAbility("Throne of Heroes") || AltAbility("Throne of Heroes")->CurrentRank == 0) {
-					WriteChatf("\arI don't have the \ayThrone of Heroes \arAA\aw!");
-				}
+			}
+			else {
+				WriteChatf("\arI don't have the \ayThrone of Heroes \arAA\aw!");
 			}
 			return;
 		}
 		if (!_stricmp(Arg, "blood")) {
-			if (AltAbility("Harmonic Dissonance") && AltAbility("Harmonic Dissonance")->CurrentRank > 0 && AltAbilityReady("Harmonic Dissonance")) {
-				canHarmonicAA = true;
-				return;
-			}
-			else {
-				if (AltAbility("Harmonic Dissonance") && AltAbility("Harmonic Dissonance")->CurrentRank > 0 && !AltAbilityReady("Harmonic Dissonance")) {
+			if (AltAbility("Harmonic Dissonance") && AltAbility("Harmonic Dissonance")->CurrentRank > 0) {
+				if (AltAbilityReady("Harmonic Dissonance")) {
+					canHarmonicAA = true;
+				}
+				else {
 					WriteChatf("\ayHarmonic Dissonance \arisn't ready right now\aw.");
 				}
-				else if (!AltAbility("Harmonic Dissonance") || AltAbility("Harmonic Dissonance")->CurrentRank == 0) {
-					WriteChatf("\arI don't have the \ayHarmonic Dissonance \arAA\aw!");
-				}
+			}
+			else {
+				WriteChatf("\arI don't have the \ayHarmonic Dissonance \arAA\aw!");
 			}
 			return;
 		}
@@ -459,20 +409,23 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			}
 			return;	
 		}
-		if (!_stricmp(Arg, "teleport")) { // use teleportAA
-			if (AltAbility("Teleport") && AltAbility("Teleport")->CurrentRank > 0 && AltAbilityReady("Teleport")) {
-				canTeleportAA = true;
-				return;
-			}
-			else {
-				if (AltAbility("Teleport") && AltAbility("Teleport")->CurrentRank > 0 && !AltAbilityReady("Teleport")) {
+		if (!_stricmp(Arg, "teleport")) {
+			if (AltAbility("Teleport") && AltAbility("Teleport")->CurrentRank > 0) {
+				if (AltAbilityReady("Teleport")) {
+					canTeleportAA = true;
+				}
+				else {
 					WriteChatf("\ayTeleport \arisn't ready right now\aw.");
 				}
-				if (!AltAbility("Teleport") || AltAbility("Teleport")->CurrentRank == 0) {
-					WriteChatf("\arI don't have the \ayTeleport \arAA\aw!");
-				}
-				return;			
 			}
+			else {
+				WriteChatf("\arI don't have the \ayTeleport \arAA\aw!");
+			}
+			return;
+		}
+		if (!_stricmp(Arg, "crystal")) { // Froststone Crystal Resonator ToV pre-order item
+			StatusItemCheck("Froststone Crystal Resonator");
+			return;
 		}
 	}
 	WriteChatf("\arYou didn't provide a valid option for /relocate.\aw");
@@ -595,7 +548,6 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	WriteChatf("\arYou are not a Wizard! No Translocate for you\aw!");
 }
 
-//Check to see if an alias exists with the name of "ShortCommand"
 bool HaveAlias(PCHAR ShortCommand) {
 	std::string sName = ShortCommand;
 	std::transform(sName.begin(), sName.end(), sName.begin(), tolower);
@@ -605,10 +557,8 @@ bool HaveAlias(PCHAR ShortCommand) {
 	return false;
 }
 
-// Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	VERSION = 1.3f;
 	iPulseDelay = 75;
 	if ((HaveAlias("/relo")) || (HaveAlias("/relocate"))) { //check our aliases
 		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
@@ -625,7 +575,6 @@ PLUGIN_API VOID InitializePlugin(VOID)
 	}
 }
 
-// Called once, when the plugin is to shutdown
 PLUGIN_API VOID ShutdownPlugin(VOID)
 {
 	RemoveCommand("/relo");
@@ -633,7 +582,6 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 	RemoveCommand("/translocate");
 }
 
-// This is called every time MQ pulses (MainLOOP!)
 PLUGIN_API VOID OnPulse(VOID)
 {
 	if (++iPulse < iPulseDelay) return;
@@ -786,7 +734,6 @@ bool IsTargetPlayer(PCHAR szItem) {
 	return false;
 }
 
-// Called once directly after initialization, and then every time the gamestate changes
 PLUGIN_API VOID SetGameState(DWORD GameState)
 {
 	//if (GameState==GAMESTATE_INGAME)
@@ -797,28 +744,17 @@ PLUGIN_API VOID SetGameState(DWORD GameState)
 	}
 }
 
-/** THIS IS A BLOCK COMMENT!
-// Called once directly after initialization, and then every time the gamestate changes
-PLUGIN_API VOID SetGameState(DWORD GameState)
-{
-	//if (GameState==GAMESTATE_INGAME)
-	//Wasn't sure if this would ever be needed, so holding onto it.
+void StatusItemCheck(char* itemname) {
+	if (FindItemByName(itemname)) {
+		if (IsClickyReadyByItemName(itemname)) {
+			UseClickyByItemName(itemname);
+			return;
+		}
+		else {
+			WriteChatf("\ay%s \aris not ready\aw!", itemname);
+			return;
+		}
+	}
+	WriteChatf("\arYou do not have a \ay%s\aw!", itemname);
+	return;
 }
-
-// This is called every time WriteChatColor is called by MQ2Main or any plugin,
-// IGNORING FILTERS, IF YOU NEED THEM MAKE SURE TO IMPLEMENT THEM. IF YOU DONT
-// CALL CEverQuest::dsp_chat MAKE SURE TO IMPLEMENT EVENTS HERE (for chat plugins)
-PLUGIN_API DWORD OnWriteChatColor(PCHAR Line, DWORD Color, DWORD Filter)
-{
-	//Wasn't sure if this would ever be needed, so hanging onto it.
-	return 0;
-}
-
-// This is called every time EQ shows a line of chat with CEverQuest::dsp_chat,
-// but after MQ filters and chat events are taken care of.
-PLUGIN_API DWORD OnIncomingChat(PCHAR Line, DWORD Color)
-{
-	//Wasn't sure if this would ever be needed, so hanging onto it.
-	return 0;
-}
-**/
