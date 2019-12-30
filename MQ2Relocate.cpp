@@ -25,20 +25,41 @@ Changelog:
 	11/15/2019 - V1.3 - Updated /relocate fellowship to make you visible before you click fellowship insignia
 	12/20/2019 - V1.4 - Updated /relocate crystal for ToV pre-order item "Froststone Crystal Resonator"
 					  - Updated the single use items to use a function with cleaner functionality
+	12/30/2019 - V.15 - Update to move all of CWTNCommons functions into the plugin directly
+					  - Updated HaveAlias() to query the macroquest2.ini and not use maps across .DLL boundaries (unsafe!) ((thank you Knightly))
 **/
 #include "../MQ2Plugin.h"
-#include "../CWTN/CWTNCommons/UtilityFunctions.h"
+
+#include <string>
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.4);
+PLUGIN_VERSION(1.5);
 
+#define TargetIt(X) *(PSPAWNINFO*)ppTarget=X
+
+PALTABILITY AltAbility(std::string szAltName);
+PSPAWNINFO MyTarget();
+DWORD MyTargetID();
+PSPAWNINFO Me();
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine);
-void TransloCmd(PSPAWNINFO pChar, PCHAR szLine);
-bool HaveAlias(PCHAR ShortCommand);
-bool UseClickyByItemName(PCHAR szItem);
-bool IsClickyReadyByItemName(PCHAR szItem);
-bool IsTargetPlayer(PCHAR szItem);
 void StatusItemCheck(char* itemname);
+void TransloCmd(PSPAWNINFO pChar, PCHAR szLine);
+void UseItem(PCHAR szItem);
+bool HaveAlias(const std::string& aliasName);
+bool UseClickyByItemName(PCHAR szItem);
+bool IAmDead();
+bool Invis(PSPAWNINFO pSpawn);
+bool IsClickyReadyByItemName(PCHAR szItem);
+bool IsSpellBookOpen();
+bool IsTargetPlayer(PCHAR szItem);
+bool ItemReady(PCHAR szItem);
+bool ImDucking();
+bool AltAbilityReady(PCHAR, DWORD TargetID = 0);
+bool Casting();
+bool DiscReady(PSPELL);
+bool Moving(PSPAWNINFO pSpawn);
+inline bool InGame();
+int GroupSize();
 
 char convertoption[MAX_STRING] = { 0 };
 char reloClicky[128] = { 0 };
@@ -53,6 +74,13 @@ bool canEvacAA = false;
 bool canTranslocate = false;
 bool canTeleportAA = false;
 bool canGroupEvacAA = false;
+bool bDebugging = true;
+
+unsigned __int64 GlobalLastTimeUsed = GetTickCount64();
+
+int iPulse = 0;
+int iPulseDelay = 75;
+int GlobalSkillDelay = 600;
 
 void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	if (!InGame())
@@ -548,18 +576,17 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	WriteChatf("\arYou are not a Wizard! No Translocate for you\aw!");
 }
 
-bool HaveAlias(PCHAR ShortCommand) {
-	std::string sName = ShortCommand;
-	std::transform(sName.begin(), sName.end(), sName.begin(), tolower);
-	if (mAliases.find(sName) != mAliases.end()) {
-		return true;
+bool HaveAlias(const std::string& aliasName) {
+	char szTemp[MAX_STRING] = { 0 };
+	GetPrivateProfileString("Aliases", aliasName.c_str(), "None", szTemp, MAX_STRING, gszINIPath);
+	if (!_stricmp(szTemp, "None")) {
+		return false;
 	}
-	return false;
+	return true;
 }
 
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	iPulseDelay = 75;
 	if ((HaveAlias("/relo")) || (HaveAlias("/relocate"))) { //check our aliases
 		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
@@ -757,4 +784,174 @@ void StatusItemCheck(char* itemname) {
 	}
 	WriteChatf("\arYou do not have a \ay%s\aw!", itemname);
 	return;
+}
+
+// Moved from CWTN Commons
+
+inline bool InGame() {
+	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetCharInfo2());
+}
+
+PALTABILITY AltAbility(std::string szAltName) {
+	int level = -1;
+	if (PSPAWNINFO pMe = (PSPAWNINFO)pLocalPlayer) {
+		level = pMe->Level;
+	}
+	for (unsigned long nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
+		if (PALTABILITY pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
+			if (PCHAR pName = pCDBStr->GetString(pAbility->nName, 1, NULL)) {
+				if (!_stricmp(szAltName.c_str(), pName)) {
+					return pAbility;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool AltAbilityReady(PCHAR szLine, DWORD TargetID) {
+	if (!InGame() || IsSpellBookOpen() || IAmDead() || Casting()) return false;
+	PSPAWNINFO me = GetCharInfo()->pSpawn;
+	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Casting() || Invis(me)) return false;
+	int level = -1;
+	if (PSPAWNINFO pMe = (PSPAWNINFO)pLocalPlayer) {
+		level = pMe->Level;
+	}
+	for (unsigned long nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
+		if (PALTABILITY pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
+			if (PCHAR pName = pCDBStr->GetString(pAbility->nName, 1, NULL)) {
+				if (!_stricmp(szLine, pName)) {
+					if (pAbility->SpellID != 0xFFFFFFFF) {
+						if (PSPELL myAltAbility = GetSpellByID(pAbility->SpellID)) {
+							//Am I in motion?
+							if (myAltAbility->CastTime && Moving(Me())) {
+								return false;
+							}
+							if (DiscReady(myAltAbility))
+								return pAltAdvManager->IsAbilityReady(pPCData, pAbility, 0);
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+int GroupSize() {
+	if (InGame()) {
+		DWORD n = 0;
+		if (!GetCharInfo()->pGroupInfo) {
+			return 0;
+		}
+		for (int i = 1; i < 6; i++) {
+			if (GetCharInfo()->pGroupInfo->pMember[i]) n++;
+		}
+		if (n) n++;
+		return n;
+	}
+	return false;
+}
+
+PSPAWNINFO MyTarget() {
+	if (!pTarget) {
+		return false;
+	}	
+	if (PSPAWNINFO target = (PSPAWNINFO)pTarget) {
+		return target;
+	}
+	return false;
+}
+
+DWORD MyTargetID() {
+	if (pTarget) {
+		return ((PSPAWNINFO)pTarget)->SpawnID;
+	}
+	return false;
+}
+
+PSPAWNINFO Me() {
+	if (PSPAWNINFO me = GetCharInfo()->pSpawn) {
+		return me;
+	}
+	return false;
+}
+
+bool ImDucking() {
+	return Me()->StandState == STANDSTATE_DUCK;
+}
+
+bool Casting() {
+	return GetCharInfo()->pSpawn->CastingData.IsCasting();
+}
+
+bool Moving(PSPAWNINFO pSpawn) {
+	if (FindSpeed(pSpawn))
+		return true;
+	else
+		return false;
+}
+
+bool ItemReady(PCHAR szItem) {
+	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
+	if (Casting()) return false;
+	if (PCONTENTS item = FindItemByName(szItem, true)) {
+		if (PITEMINFO pIteminf = GetItemFromContents(item)) {
+			if (pIteminf->Clicky.TimerID != -1) {
+				DWORD timer = GetItemTimer(item);
+				if (timer == 0 && !Moving((PSPAWNINFO)GetCharInfo()->pSpawn))
+					return true;
+			}
+			else if (pIteminf->Clicky.SpellID != -1)
+			{
+				return true; // insta-click or instant recast
+			}
+		}
+	}
+	return false;
+}
+
+void UseItem(PCHAR szItem) {
+	if (GlobalLastTimeUsed >= GetTickCount64()) return;
+	char temp[MAX_STRING] = "/useitem \"";
+	strcat_s(temp, MAX_STRING, szItem);
+	char temp2[MAX_STRING] = "\"";
+	strcat_s(temp, MAX_STRING, temp2);
+	EzCommand(temp);
+	WriteChatf("Using Item: \ay%s", szItem);
+	GlobalLastTimeUsed = GetTickCount64() + GlobalSkillDelay;
+}
+
+bool IsSpellBookOpen() {
+	return (PCSIDLWND)pSpellBookWnd->IsVisible();
+}
+
+bool IAmDead() {
+	if (PSPAWNINFO Me = GetCharInfo()->pSpawn) {
+		if (Me->RespawnTimer) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Invis(PSPAWNINFO pSpawn) {
+	return pSpawn->HideMode;
+}
+
+bool DiscReady(PSPELL pSpell) {
+	if (!InGame()) return false;
+	DWORD timeNow = (DWORD)time(NULL);
+#if !defined(ROF2EMU) && !defined(UFEMU)
+	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex, pSpell->SpellGroup) < timeNow) {
+#else
+	if (pSpell->ReuseTimerIndex == -1 || pSpell->ReuseTimerIndex > 20)//this matters on emu it will actually crash u if above 20
+	{
+		return true;
+	}
+	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex) < timeNow) {
+#endif
+		return true;
+	}
+	return false;
 }
