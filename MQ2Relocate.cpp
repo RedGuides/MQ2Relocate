@@ -857,26 +857,26 @@ int GroupSize() {
 
 PSPAWNINFO MyTarget() {
 	if (!pTarget) {
-		return false;
+		return nullptr;
 	}	
 	if (PSPAWNINFO target = (PSPAWNINFO)pTarget) {
 		return target;
 	}
-	return false;
+	return nullptr;
 }
 
 DWORD MyTargetID() {
 	if (pTarget) {
 		return ((PSPAWNINFO)pTarget)->SpawnID;
 	}
-	return false;
+	return 0;
 }
 
 PSPAWNINFO Me() {
 	if (PSPAWNINFO me = GetCharInfo()->pSpawn) {
 		return me;
 	}
-	return false;
+	return nullptr;
 }
 
 bool ImDucking() {
