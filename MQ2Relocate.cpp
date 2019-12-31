@@ -25,15 +25,17 @@ Changelog:
 	11/15/2019 - V1.3 - Updated /relocate fellowship to make you visible before you click fellowship insignia
 	12/20/2019 - V1.4 - Updated /relocate crystal for ToV pre-order item "Froststone Crystal Resonator"
 					  - Updated the single use items to use a function with cleaner functionality
-	12/30/2019 - V.15 - Update to move all of CWTNCommons functions into the plugin directly
+	12/30/2019 - V1.5 - Update to move all of CWTNCommons functions into the plugin directly
 					  - Updated HaveAlias() to query the macroquest2.ini and not use maps across .DLL boundaries (unsafe!) ((thank you Knightly))
+	12/31/2019 - V1.51- Updated to correct MacroQuest2.ini path for HaveAlias();
+					  - Removed redundant /relo check per Knightly
 **/
 #include "../MQ2Plugin.h"
 
 #include <string>
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.5);
+PLUGIN_VERSION(1.51);
 
 #define TargetIt(X) *(PSPAWNINFO*)ppTarget=X
 
@@ -578,7 +580,9 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 
 bool HaveAlias(const std::string& aliasName) {
 	char szTemp[MAX_STRING] = { 0 };
-	GetPrivateProfileString("Aliases", aliasName.c_str(), "None", szTemp, MAX_STRING, gszINIPath);
+	char mq2dir[128] = "";
+	sprintf_s(mq2dir, 128, "%s\\MacroQuest2.ini", gszINIPath);
+	GetPrivateProfileString("Aliases", aliasName.c_str(), "None", szTemp, MAX_STRING, mq2dir);
 	if (!_stricmp(szTemp, "None")) {
 		return false;
 	}
@@ -587,7 +591,7 @@ bool HaveAlias(const std::string& aliasName) {
 
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	if ((HaveAlias("/relo")) || (HaveAlias("/relocate"))) { //check our aliases
+	if (HaveAlias("/relocate")) { //check our aliases
 		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
@@ -596,7 +600,6 @@ PLUGIN_API VOID InitializePlugin(VOID)
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 	else {
-		AddCommand("/relo", ReloCmd);
 		AddCommand("/relocate", ReloCmd);
 		AddCommand("/translocate", TransloCmd);
 	}
@@ -604,7 +607,6 @@ PLUGIN_API VOID InitializePlugin(VOID)
 
 PLUGIN_API VOID ShutdownPlugin(VOID)
 {
-	RemoveCommand("/relo");
 	RemoveCommand("/relocate");
 	RemoveCommand("/translocate");
 }
@@ -955,3 +957,4 @@ bool DiscReady(PSPELL pSpell) {
 	}
 	return false;
 }
+
