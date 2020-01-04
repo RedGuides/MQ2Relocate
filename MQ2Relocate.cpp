@@ -29,13 +29,14 @@ Changelog:
 					  - Updated HaveAlias() to query the macroquest2.ini and not use maps across .DLL boundaries (unsafe!) ((thank you Knightly))
 	12/31/2019 - V1.51- Updated to correct MacroQuest2.ini path for HaveAlias();
 					  - Removed redundant /relo check per Knightly
+	01/04/2020 - V1.6 - Updated MQ2Relocate to /twist off if you are a bard
 **/
 #include "../MQ2Plugin.h"
 
 #include <string>
 
 PreSetup("MQ2Relocate");
-PLUGIN_VERSION(1.51);
+PLUGIN_VERSION(1.6);
 
 #define TargetIt(X) *(PSPAWNINFO*)ppTarget=X
 
@@ -60,6 +61,8 @@ bool AltAbilityReady(PCHAR, DWORD TargetID = 0);
 bool Casting();
 bool DiscReady(PSPELL);
 bool Moving(PSPAWNINFO pSpawn);
+bool FindPlugin(PCHAR szLine);
+bool IAmBard();
 inline bool InGame();
 int GroupSize();
 
@@ -91,7 +94,14 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
 	if (strlen(Arg)) {
-		char temp[MAX_STRING] = "/useitem ";
+		char temp[MAX_STRING] = { 0 };
+		if (IAmBard() && FindPlugin("mq2twist")) {
+			sprintf_s(temp, "/multiline ; /twist off ; /timed 5 ; /useitem ");
+			WriteChatf("\agWe are going to /twist off, to use our relocate items.");
+		}
+		else {
+			sprintf_s(temp, "/useitem ");
+		}
 		if (!_stricmp(Arg, "help")) { //output available arguments for /relocate
 			WriteChatf("Welcome to MQ2Relocate!");
 			WriteChatf("By \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.");
@@ -896,7 +906,7 @@ bool Moving(PSPAWNINFO pSpawn) {
 
 bool ItemReady(PCHAR szItem) {
 	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
-	if (Casting()) return false;
+	if (!IAmBard() && Casting()) return false;
 	if (PCONTENTS item = FindItemByName(szItem, true)) {
 		if (PITEMINFO pIteminf = GetItemFromContents(item)) {
 			if (pIteminf->Clicky.TimerID != -1) {
@@ -958,3 +968,18 @@ bool DiscReady(PSPELL pSpell) {
 	return false;
 }
 
+bool FindPlugin(PCHAR szLine) {
+	if (!strlen(szLine)) return false;
+	PMQPLUGIN pPlugin = pPlugins;
+	while (pPlugin) {
+		if (!_stricmp(szLine, pPlugin->szFilename)) {
+			return true;
+		}
+		pPlugin = pPlugin->pNext;
+	}
+	return false;
+}
+
+bool IAmBard() {
+	return GetCharInfo2()->Class == EQData::Bard;
+}
