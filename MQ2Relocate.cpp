@@ -334,17 +334,17 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			return;
 		}
 		if (!_stricmp(Arg, "anchor")) { // Use Primary or Secondary Anchor
-			if (FindItemByName("Primary Anchor Transport Device")) {
-				if (IsClickyReadyByItemName("Primary Anchor Transport Device")) {
-					sprintf_s(reloClicky, "Primary Anchor Transport Device");
-					UseClickyByItemName(reloClicky);
-				}
+				// Not doing a "Find Item" because IsClickyReady function already does that
+				// We are also verifying that we don't have the "anchor" in our inventory by ID 52584 for Primary Anchor
+			if (IsClickyReadyByItemName("Primary Anchor Transport Device") && !FindItemCountByID(52584)) {
+				sprintf_s(reloClicky, "Primary Anchor Transport Device");
+				UseClickyByItemName(reloClicky);
 			}
-			else if (FindItemByName("Secondary Anchor Transport Device")) {
-				if (IsClickyReadyByItemName("Secondary Anchor Transport Device")) {
+			// Not doing a "Find Item" because IsClickyReady function already does that
+			// We are also verifying that we don't have the "anchor" in our inventory by ID 52585 for Secondary Anchor
+			else if (IsClickyReadyByItemName("Secondary Anchor Transport Device") & !FindItemCountByID(52585)) {
 					sprintf_s(reloClicky, "Secondary Anchor Transport Device");
 					UseClickyByItemName(reloClicky);
-				}
 			}
 			else {
 				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
