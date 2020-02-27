@@ -31,14 +31,10 @@ Changelog:
 					  - Removed redundant /relo check per Knightly
 	01/04/2020 - V1.6 - Updated MQ2Relocate to /twist off if you are a bard
 **/
-#include "../MQ2Plugin.h"
-
-#include <string>
+#include <mq/Plugin.h>
 
 PreSetup("MQ2Relocate");
 PLUGIN_VERSION(1.6);
-
-#define TargetIt(X) *(PSPAWNINFO*)ppTarget=X
 
 PALTABILITY AltAbility(std::string szAltName);
 PSPAWNINFO MyTarget();
@@ -61,7 +57,6 @@ bool AltAbilityReady(PCHAR, DWORD TargetID = 0);
 bool Casting();
 bool DiscReady(PSPELL);
 bool Moving(PSPAWNINFO pSpawn);
-bool FindPlugin(PCHAR szLine);
 bool IAmBard();
 inline bool InGame();
 int GroupSize();
@@ -81,7 +76,7 @@ bool canTeleportAA = false;
 bool canGroupEvacAA = false;
 bool bDebugging = true;
 
-unsigned __int64 GlobalLastTimeUsed = GetTickCount64();
+uint64_t GlobalLastTimeUsed = GetTickCount64();
 
 int iPulse = 0;
 int iPulseDelay = 75;
@@ -95,7 +90,7 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	GetArg(Arg, szLine, 1);
 	if (strlen(Arg)) {
 		char temp[MAX_STRING] = { 0 };
-		if (IAmBard() && FindPlugin("mq2twist")) {
+		if (IAmBard() && IsPluginLoaded("mq2twist")) {
 			sprintf_s(temp, "/multiline ; /twist off ; /timed 5 ; /useitem ");
 			WriteChatf("\agWe are going to /twist off, to use our relocate items.");
 		}
@@ -280,15 +275,15 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			return;
 		}
 		if (!_stricmp(Arg, "gate")) { // use gate AA if you have it, otherwise try and use a gate potion
-			DWORD classID = GetCharInfo2()->Class;
+			DWORD classID = GetPcProfile()->Class;
 			switch (classID) {
-			case EQData::Cleric:
-			case EQData::Druid:
-			case EQData::Enchanter:
-			case EQData::Mage:
-			case EQData::Necromancer:
-			case EQData::Shaman:
-			case EQData::Wizard:
+			case Cleric:
+			case Druid:
+			case Enchanter:
+			case Mage:
+			case Necromancer:
+			case Shaman:
+			case Wizard:
 				if (AltAbility("Gate") && AltAbility("Gate")->CurrentRank > 0) {
 					canGateAA = true;
 					return;
@@ -410,9 +405,9 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			return;
 		}
 		if (!_stricmp(Arg, "evac")) { // use evac AA if you have it
-			DWORD classID = GetCharInfo2()->Class;
+			DWORD classID = GetPcProfile()->Class;
 			switch (classID) {
-			case EQData::Druid:
+			case Druid:
 				if (GroupSize() > 1 && AltAbility("Exodus") && AltAbility("Exodus")->CurrentRank > 0 && AltAbilityReady("Exodus")) { // Exodus GROUP evac 43
 					canGroupEvacAA = true;
 					break;
@@ -421,17 +416,17 @@ void ReloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					canEvacAA = true;
 					break;
 				}
-			case EQData::Necromancer:
+			case Necromancer:
 				if (AltAbility("Levant") && AltAbility("Levant")->CurrentRank > 0 && AltAbilityReady("Levant")) { // Self Evac
 					canEvacAA = true;
 					break;
 				}
-			case EQData::Rogue:
+			case Rogue:
 				if (AltAbility("Stealthy Getaway") && AltAbility("Stealthy Getaway")->CurrentRank > 0 && AltAbilityReady("Stealthy Getaway")) { // Self Evac 789
 					canEvacAA = true;
 					break;
 				}
-			case EQData::Wizard:
+			case Wizard:
 				if (GroupSize() > 1 && AltAbility("Exodus") && AltAbility("Exodus")->CurrentRank > 0 && AltAbilityReady("Exodus")) { // Exodus GROUP evac 43
 					canGroupEvacAA = true;
 					break;
@@ -484,8 +479,8 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		WriteChatf("\ay/translocate\aw \arRedBot\aw to Translocate \arRedBot\aw to their bind.");
 		return;
 	}
-	DWORD classID = GetCharInfo2()->Class;
-	if (classID == EQData::Wizard) { // If I am a wizard?
+	DWORD classID = GetPcProfile()->Class;
+	if (classID == Wizard) { // If I am a wizard?
 		if (!MyTarget()) {
 			if (strlen(Arg) == 0) {
 				WriteChatf(static_cast<char*>("\arPlease provide a target for translocate\aw."));
@@ -513,7 +508,7 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					WriteChatf("\arIt seems \ay%s\aw is out of range of \ay%s\aw.", Arg, pSpell->Name); // double check this spits out both %s
 					return;
 				}
-				TargetIt(desiredTarget);
+				pTarget = desiredTarget;
 				if (!MyTarget()) {
 					WriteChatf("\arWe do not have a target.");
 					return;
@@ -570,7 +565,7 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					WriteChatf("\arIt seems \ay%s\ar is out of range of \ay%s\aw.", Arg, pSpell->Name); // double check this spits out both %s
 					return;
 				}
-				TargetIt(desiredTarget);
+				pTarget = desiredTarget;
 				if (!MyTarget()) {
 					WriteChatf("We do not have a target.");
 					return;
@@ -589,11 +584,8 @@ void TransloCmd(PSPAWNINFO pChar, PCHAR szLine) {
 }
 
 bool HaveAlias(const std::string& aliasName) {
-	char szTemp[MAX_STRING] = { 0 };
-	char mq2dir[128] = "";
-	sprintf_s(mq2dir, 128, "%s\\MacroQuest2.ini", gszINIPath);
-	GetPrivateProfileString("Aliases", aliasName.c_str(), "None", szTemp, MAX_STRING, mq2dir);
-	if (!_stricmp(szTemp, "None")) {
+	const std::string alias = GetPrivateProfileString("Aliases", aliasName, "None", gPathMQini);
+	if (alias == "None") {
 		return false;
 	}
 	return true;
@@ -801,7 +793,7 @@ void StatusItemCheck(char* itemname) {
 // Moved from CWTN Commons
 
 inline bool InGame() {
-	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetCharInfo2());
+	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetPcProfile());
 }
 
 PALTABILITY AltAbility(std::string szAltName) {
@@ -811,7 +803,7 @@ PALTABILITY AltAbility(std::string szAltName) {
 	}
 	for (unsigned long nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
 		if (PALTABILITY pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
-			if (PCHAR pName = pCDBStr->GetString(pAbility->nName, 1, NULL)) {
+			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szAltName.c_str(), pName)) {
 					return pAbility;
 				}
@@ -831,7 +823,7 @@ bool AltAbilityReady(PCHAR szLine, DWORD TargetID) {
 	}
 	for (unsigned long nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
 		if (PALTABILITY pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
-			if (PCHAR pName = pCDBStr->GetString(pAbility->nName, 1, NULL)) {
+			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szLine, pName)) {
 					if (pAbility->SpellID != 0xFFFFFFFF) {
 						if (PSPELL myAltAbility = GetSpellByID(pAbility->SpellID)) {
@@ -935,7 +927,7 @@ void UseItem(PCHAR szItem) {
 }
 
 bool IsSpellBookOpen() {
-	return (PCSIDLWND)pSpellBookWnd->IsVisible();
+	return pSpellBookWnd->IsVisible();
 }
 
 bool IAmDead() {
@@ -968,18 +960,6 @@ bool DiscReady(PSPELL pSpell) {
 	return false;
 }
 
-bool FindPlugin(PCHAR szLine) {
-	if (!strlen(szLine)) return false;
-	PMQPLUGIN pPlugin = pPlugins;
-	while (pPlugin) {
-		if (!_stricmp(szLine, pPlugin->szFilename)) {
-			return true;
-		}
-		pPlugin = pPlugin->pNext;
-	}
-	return false;
-}
-
 bool IAmBard() {
-	return GetCharInfo2()->Class == EQData::Bard;
+	return GetPcProfile()->Class == Bard;
 }
