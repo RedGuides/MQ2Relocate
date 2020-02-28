@@ -15,7 +15,7 @@ SPAWNINFO* MyTarget();
 unsigned long MyTargetID();
 SPAWNINFO* Me();
 void ReloCmd(SPAWNINFO* pChar, char* szLine);
-void StatusItemCheck(char* pItemname);
+void StatusItemCheck(char* szItemName);
 void TransloCmd(SPAWNINFO* pChar, char* szLine);
 void UseItem(char* pItem);
 bool TargetSpawn(SPAWNINFO* pSpawn);
@@ -25,14 +25,14 @@ bool IAmDead();
 bool Invis(SPAWNINFO* pSpawn);
 bool IsClickyReadyByItemName(char* pItem);
 bool IsSpellBookOpen();
-bool IsTargetPlayer(char* pChar);
-bool ItemReady(char* pItem);
+bool IsTargetPlayer();
+bool ItemReady(char* szItem);
 bool ImDucking();
-bool AltAbilityReady(char*, unsigned long TargetID = 0);
+bool AltAbilityReady(const char*, unsigned long TargetID = 0);
 bool Casting();
 bool DiscReady(SPELL*);
 bool Moving(SPAWNINFO* pSpawn);
-bool FindPlugin(char* pChar);
+bool FindPlugin(const char* pChar);
 inline bool InGame();
 int GroupSize();
 
@@ -708,7 +708,8 @@ PLUGIN_API void OnPulse()
 	}
 }
 
-bool UseClickyByItemName(char* pItem) {
+bool UseClickyByItemName(char* pItem)
+{
 	if (FindItemCountByName(pItem)) {
 		if (PCONTENTS item = FindItemByName(pItem)) {
 			if (PITEMINFO pIteminf = GetItemFromContents(item)) {
@@ -724,7 +725,8 @@ bool UseClickyByItemName(char* pItem) {
 	return false;
 }
 
-bool IsClickyReadyByItemName(char* pItem) {
+bool IsClickyReadyByItemName(char* pItem)
+{
 	if (FindItemCountByName(pItem)) {
 		if (CONTENTS* pItemContents = FindItemByName(pItem)) {
 			if (ITEMINFO* pItemInfo = GetItemFromContents(pItemContents)) {
@@ -739,7 +741,8 @@ bool IsClickyReadyByItemName(char* pItem) {
 	return false;
 }
 
-bool IsTargetPlayer(char* pChar) {
+bool IsTargetPlayer()
+{
 	if (SPAWNINFO* target = (SPAWNINFO*)pTarget) {
 		if (target->Type == SPAWN_PLAYER) {
 			return true;
@@ -757,26 +760,29 @@ PLUGIN_API void SetGameState(unsigned long GameState)
 	}
 }
 
-void StatusItemCheck(char* pItemname) {
-	if (FindItemByName(pItemname)) {
-		if (IsClickyReadyByItemName(pItemname)) {
-			UseClickyByItemName(pItemname);
+void StatusItemCheck(char* szItemName)
+{
+	if (FindItemByName(szItemName)) {
+		if (IsClickyReadyByItemName(szItemName)) {
+			UseClickyByItemName(szItemName);
 			return;
 		}
 		else {
-			WriteChatf("\ay%s \aris not ready\aw!", pItemname);
+			WriteChatf("\ay%s \aris not ready\aw!", szItemName);
 			return;
 		}
 	}
-	WriteChatf("\arYou do not have a \ay%s\aw!", pItemname);
+	WriteChatf("\arYou do not have a \ay%s\aw!", szItemName);
 	return;
 }
 
-inline bool InGame() {
+inline bool InGame()
+{
 	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetCharInfo2());
 }
 
-ALTABILITY* AltAbility(std::string szAltName) {
+ALTABILITY* AltAbility(std::string szAltName)
+{
 	int level = -1;
 	if (SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer) {
 		level = pMe->Level;
@@ -793,7 +799,8 @@ ALTABILITY* AltAbility(std::string szAltName) {
 	return nullptr;
 }
 
-bool AltAbilityReady(char* szLine, unsigned long TargetID) {
+bool AltAbilityReady(const char* szLine, unsigned long TargetID)
+{
 	if (!InGame() || IsSpellBookOpen() || IAmDead() || Casting()) return false;
 	SPAWNINFO* me = GetCharInfo()->pSpawn;
 
@@ -824,9 +831,10 @@ bool AltAbilityReady(char* szLine, unsigned long TargetID) {
 	return false;
 }
 
-int GroupSize() {
+int GroupSize()
+{
 	if (InGame()) {
-		unsigned long n = 0;
+		int n = 0;
 		if (!GetCharInfo()->pGroupInfo) {
 			return 0;
 		}
@@ -840,7 +848,8 @@ int GroupSize() {
 	return false;
 }
 
-SPAWNINFO* MyTarget() {
+SPAWNINFO* MyTarget()
+{
 	if (!pTarget) {
 		return nullptr;
 	}
@@ -850,39 +859,45 @@ SPAWNINFO* MyTarget() {
 	return nullptr;
 }
 
-unsigned long MyTargetID() {
+unsigned long MyTargetID()
+{
 	if (pTarget) {
 		return ((SPAWNINFO*)pTarget)->SpawnID;
 	}
 	return 0;
 }
 
-SPAWNINFO* Me() {
+SPAWNINFO* Me()
+{
 	if (SPAWNINFO* me = GetCharInfo()->pSpawn) {
 		return me;
 	}
 	return nullptr;
 }
 
-bool ImDucking() {
+bool ImDucking()
+{
 	return Me()->StandState == STANDSTATE_DUCK;
 }
 
-bool Casting() {
+bool Casting()
+{
 	return GetCharInfo()->pSpawn->CastingData.IsCasting();
 }
 
-bool Moving(SPAWNINFO* pSpawn) {
+bool Moving(SPAWNINFO* pSpawn)
+{
 	if (FindSpeed(pSpawn))
 		return true;
 	else
 		return false;
 }
 
-bool ItemReady(char* pItem) {
+bool ItemReady(char* szItem)
+{
 	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
 	if (GetCharInfo2()->Class != EQData::Bard && Casting()) return false;
-	if (CONTENTS* item = FindItemByName(pItem, true)) {
+	if (CONTENTS* item = FindItemByName(szItem, true)) {
 		if (ITEMINFO* pIteminf = GetItemFromContents(item)) {
 			if (pIteminf->Clicky.TimerID != -1) {
 				unsigned long timer = GetItemTimer(item);
@@ -898,7 +913,8 @@ bool ItemReady(char* pItem) {
 	return false;
 }
 
-void UseItem(char* pItem) {
+void UseItem(char* pItem)
+{
 	if (GlobalLastTimeUsed >= GetTickCount64()) return;
 	char temp[MAX_STRING] = "/useitem \"";
 	strcat_s(temp, MAX_STRING, pItem);
@@ -909,11 +925,13 @@ void UseItem(char* pItem) {
 	GlobalLastTimeUsed = GetTickCount64() + GlobalSkillDelay;
 }
 
-bool IsSpellBookOpen() {
+bool IsSpellBookOpen()
+{
 	return (CSIDLWND*)pSpellBookWnd->IsVisible();
 }
 
-bool IAmDead() {
+bool IAmDead()
+{
 	if (SPAWNINFO* Me = GetCharInfo()->pSpawn) {
 		if (Me->RespawnTimer) {
 			return true;
@@ -922,7 +940,8 @@ bool IAmDead() {
 	return false;
 }
 
-bool Invis(SPAWNINFO* pSpawn) {
+bool Invis(SPAWNINFO* pSpawn)
+{
 	return pSpawn->HideMode;
 }
 
@@ -944,11 +963,12 @@ bool DiscReady(SPELL* pSpell)
 	return false;
 }
 
-bool FindPlugin(char* pChar) {
-	if (!strlen(pChar)) return false;
+bool FindPlugin(const char* szPluginName)
+{
+	if (!strlen(szPluginName)) return false;
 	MQPLUGIN* pPlugin = pPlugins;
 	while (pPlugin) {
-		if (!_stricmp(pChar, pPlugin->szFilename)) {
+		if (!_stricmp(szPluginName, pPlugin->szFilename)) {
 			return true;
 		}
 		pPlugin = pPlugin->pNext;
