@@ -83,6 +83,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("/relocate \aggate\aw to use your \ayGate AA\aw or \ayTranslocation Potion\aw.");
 			WriteChatf("/relocate \agorigin\aw to use your \ayOrigin AA\aw.");
 			WriteChatf("/relocate \agbrell\aw to use your \ayMark of Brell\aw.");
+			WriteChatf("/relocate \agbronze\aw to use your \ayHarbinger's Staff\aw.");
 			WriteChatf("/relocate \aganchor\aw to use your \ayPrimary \awor \aySecondary Anchor\aw.");
 			WriteChatf("/relocate \aganchor1\aw to use your \ayPrimary Anchor\aw.");
 			WriteChatf("/relocate \aganchor2\aw to use your \aySecondary Anchor\aw.");
@@ -287,10 +288,16 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			return;
 		}
+
 		if (!_stricmp(Arg, "brell")) { // Mark of Brell for Brell's Rest
 			StatusItemCheck("Mark of Brell");
 			return;
 		}
+		if (!_stricmp(Arg, "bronze")) { // Harbinger's Staff for City of Bronze
+			StatusItemCheck("Harbinger's Staff");
+			return;
+		}
+
 		if (!_stricmp(Arg, "anchor")) { // Use Primary or Secondary Anchor
 			// Not doing a "Find Item" because IsClickyReady function already does that
 			// We are also verifying that we don't have the "anchor" in our inventory by ID 52584 for Primary Anchor
@@ -623,8 +630,7 @@ PLUGIN_API void OnPulse()
 
 	if (canGateAA && AltAbilityReady("Gate")) {
 		WriteChatf("Relocating with: \ayGate AA\aw.");
-		char gateAA[16] = "/alt act 1217";
-		EzCommand(gateAA);
+		EzCommand("/alt act 1217");
 		canGateAA = false;
 	}
 
@@ -636,74 +642,64 @@ PLUGIN_API void OnPulse()
 
 	if (canOriginAA && AltAbilityReady("Origin")) {
 		WriteChatf("Relocating with: \ayOrigin AA\aw.");
-		char originAA[16] = "/alt act 331";
-		EzCommand(originAA);
+		EzCommand("/alt act 331");
 		canOriginAA = false;
 	}
 
 	if (canLobbyAA && AltAbilityReady("Throne of Heroes")) {
 		WriteChatf("Relocating to \agGuild Lobby\aw with: \ayThrone of Heroes AA\aw.");
-		char lobbyAA[16] = "/alt act 511";
-		EzCommand(lobbyAA);
+		EzCommand("/alt act 511");
 		canLobbyAA = false;
 	}
 
 	if (canHarmonicAA && AltAbilityReady("Harmonic Dissonance")) {
 		WriteChatf("Relocating to \agTheater of Blood\aw with: \ayHarmonic Dissonance AA\aw.");
-		char harmonicAA[16] = "/alt act 511";
-		EzCommand(harmonicAA);
+		EzCommand("/alt act 574");
 		canHarmonicAA = false;
 	}
 
 	if (canEvacAA) { // Check each evac AA
 		if (AltAbilityReady("Steathly Getaway")) {
 			WriteChatf("Self Evac with: \ayStealthy Getaway AA\aw.");
-			char evacAA[16] = "/alt act 789";
-			EzCommand(evacAA);
+			EzCommand("/alt act 789");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Abscond")) {
 			WriteChatf("Self Evac with: \ayAbscond AA\aw.");
-			char evacAA[16] = "/alt act 490";
-			EzCommand(evacAA);
+			EzCommand("/alt act 490");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Egress")) {
 			WriteChatf("Self Evac with: \ayEgress AA\aw.");
-			char evacAA[16] = "/alt act 8602";
-			EzCommand(evacAA);
+			EzCommand("/alt act 8602");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Levant")) {
 			WriteChatf("Self Evac with: \ayLevant AA\aw.");
-			char evacAA[16] = "/alt act 2899";
-			EzCommand(evacAA);
+			EzCommand("/alt act 2899");
 			canEvacAA = false;
 		}
 	}
 	if (canGroupEvacAA) { // Check each evac AA
 		if (AltAbilityReady("Exodus")) {
 			WriteChatf("Group Evac with: \ayExodus AA\aw.");
-			char evacAA[16] = "/alt act 43";
-			EzCommand(evacAA);
+			EzCommand("/alt act 43");
 			canGroupEvacAA = false;
 		}
 	}
 
 	if (canTranslocate && AltAbilityReady("Translocate")) {
 		WriteChatf("Translocating \ay%s\aw with: \ayTranslocate AA\aw.", ((SPAWNINFO*)pTarget)->Name);
-		char translocateAA[16] = "/alt act 9703";
-		EzCommand(translocateAA);
+		EzCommand("/alt act 9703");
 		canTranslocate = false;
 	}
 
 	if (canTeleportAA && AltAbilityReady("Teleport")) {
 		WriteChatf("Teleporting surrounding allies with: \ayTeleport AA\aw.");
-		char teleportAA[16] = "/alt act 9704";
-		EzCommand(teleportAA);
+		EzCommand("/alt act 9704");
 		canTeleportAA = false;
 	}
 }
