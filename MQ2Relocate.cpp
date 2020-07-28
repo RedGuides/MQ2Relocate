@@ -226,10 +226,10 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			else if (FindItemByName("Brick of Knowledge") && IsClickyReadyByItemName("Brick of Knowledge")) {
 				sprintf_s(reloClicky, "Brick of Knowledge");
 			}
-			else if (FindItemByName("The Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge", 1) && IsClickyReadyByItemName("The Binden Concerrentia")) {
+			else if (FindItemByName("The Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge") && IsClickyReadyByItemName("The Binden Concerrentia")) {
 				sprintf_s(reloClicky, "The Binden Concerrentia");
 			}
-			else if (FindItemByName("The Fabled Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge", 1) && IsClickyReadyByItemName("The Fabled Binden Concerrentia")) {
+			else if (FindItemByName("The Fabled Binden Concerrentia") && FindItemCountByName("Quintessence of Knowledge") && IsClickyReadyByItemName("The Fabled Binden Concerrentia")) {
 				sprintf_s(reloClicky, "The Fabled Binden Concerrentia");
 			}
 			else {
