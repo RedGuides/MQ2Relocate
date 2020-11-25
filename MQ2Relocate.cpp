@@ -307,7 +307,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			// Not doing a "Find Item" because IsClickyReady function already does that
 			// We are also verifying that we don't have the "anchor" in our inventory by ID 52585 for Secondary Anchor
-			else if (IsClickyReadyByItemName("Secondary Anchor Transport Device") & !FindItemCountByID(52585)) {
+			else if (IsClickyReadyByItemName("Secondary Anchor Transport Device") && !FindItemCountByID(52585)) {
 					sprintf_s(reloClicky, "Secondary Anchor Transport Device");
 					UseClickyByItemName(reloClicky);
 			}
