@@ -394,6 +394,10 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			else if (AltAbility("Abscond") && AltAbility("Abscond")->CurrentRank > 0 && AltAbilityReady("Abscond")) { // Abscond SELF evac
 				canEvacAA = true;
 			}
+			else if (GetCharInfo2()->Class == EQData::Druid || GetCharInfo2()->Class == EQData::Wizard) { // only Wizards/Druids can use the Di`Zok Escape Staff
+				StatusItemCheck("Di`Zok Escape Staff");
+				return;
+			}
 
 			if (!canEvacAA && !canGroupEvacAA) {
 				WriteChatf("\arI don't seem to have the ability to evac!\aw");
