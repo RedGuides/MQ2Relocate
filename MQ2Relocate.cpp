@@ -830,8 +830,8 @@ int GroupSize()
 		if (!GetCharInfo()->pGroupInfo) {
 			return 0;
 		}
-		for (int i = 1; i < 6; i++) {
-			if (GetCharInfo()->pGroupInfo->pMember[i]) n++;
+		for (int i = 1; i < MAX_GROUP_SIZE; i++) {
+			if (GetGroupMember(i)) n++;
 		}
 
 		if (n) n++;
