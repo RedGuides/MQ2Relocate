@@ -825,15 +825,9 @@ bool AltAbilityReady(const char* szLine, unsigned long TargetID)
 
 int GroupSize()
 {
-	if (InGame()) {
-		int n = 0;
+	if (pCharData) {
 		if (pCharData->Group) {
-			for (int i = 1; i < MAX_GROUP_SIZE; i++) {
-				if (pCharData->Group->GetGroupMember(i)) n++;
-			}
-
-			if (n) n++;
-			return n;
+			return pCharData->Group->GetNumberOfMembers();
 		}
 	}
 	return 0;
