@@ -257,6 +257,10 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName("Philter of Major Translocation")) {
 					canGatePotion = true;
 				}
+				// "Gate Potion" is a progression server version
+				else if (FindItemByName("Gate Potion"), true) {
+					canGatePotion = true;
+				}
 				else {
 					WriteChatf("\arI don't seem to have the ability to gate, nor do you have a gate potion!\aw");
 				}
