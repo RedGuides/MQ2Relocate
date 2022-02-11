@@ -638,7 +638,7 @@ PLUGIN_API void OnPulse()
 		if (UseClickyByItemName("Philter of Major Translocation")) {
 			canGatePotion = false;
 		}
-		else if (UseClickyByItemName("Philter of Major Translocation")) {
+		else if (UseClickyByItemName("Gate Potion")) {
 			canGatePotion = false;
 		}
 	}
