@@ -877,18 +877,14 @@ bool ItemReady(const char* szItem)
 	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
 	if (pLocalPC->GetClass() != Bard && Casting()) return false;
 	if (ItemClient* item = FindItemByName(szItem, true)) {
-		if (ItemDefinition* pIteminf = GetItemFromContents(item)) {
-			if (pIteminf->Clicky.TimerID != -1) {
-				uint32_t timer = GetItemTimer(item);
-				if (timer == 0 && !Moving(pLocalPlayer))
-					return true;
-			}
-			else if (pIteminf->Clicky.SpellID != -1)
-			{
-				return true; // insta-click or instant recast
+		if (item->GetSpellRecastTime(ItemSpellType_Clicky) != -1) {
+			uint32_t timer = GetItemTimer(item);
+			if (timer == 0 && !Moving(pLocalPlayer)) {
+				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
