@@ -793,11 +793,9 @@ CAltAbilityData* AltAbility(const std::string szAltName)
 
 void BardStopSinging() {
 	if (Me()->GetClass() == Bard) {
-		WriteChatf("stop");
 		EzCommand("/stopsong");
 
 		if (IsPluginLoaded("mq2twist")) {
-			WriteChatf("twist");
 			EzCommand("/twist off");
 		}
 		WriteChatf("%s\agWe are going to /stopsong and /twist off, to use our relocate items.", PLUGINMSG);
