@@ -272,7 +272,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				else {
 					WriteChatf(PLUGIN_MSG "Origin \arisn't ready right now\aw.");
 				}
-				if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
+				if ((pLocalPC->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
 					if (IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 						UseClickyByItemName("Sceptre of Draconic Calling");
 					}
@@ -326,7 +326,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			if (FindItemByName("Fellowship Registration Insignia")) {
 				if (IsClickyReadyByItemName("Fellowship Registration Insignia")) {
 					if (pChar->HideMode) { // Fellowship insignia requires being visible to use
-						MakeMeVisible(GetCharInfo()->pSpawn, "");
+						MakeMeVisible(pLocalPlayer, "");
 					}
 					if (pLocalPlayer->Campfire) {
 						UseClickyByItemName("Fellowship Registration Insignia");
@@ -392,7 +392,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			else if (AltAbility("Abscond") && AltAbility("Abscond")->CurrentRank > 0 && AltAbilityReady("Abscond")) { // Abscond SELF evac
 				canEvacAA = true;
 			}
-			else if (GetPcProfile()->Class == Druid || GetPcProfile()->Class == Wizard) { // only Wizards/Druids can use the Di`Zok Escape Staff
+			else if (pLocalPC->GetClass() == Druid || pLocalPC->GetClass() == Wizard) { // only Wizards/Druids can use the Di`Zok Escape Staff
 				StatusItemCheck("Di`Zok Escape Staff");
 				return;
 			}
@@ -440,7 +440,7 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 		return;
 	}
 
-	if (GetPcProfile()->Class == Wizard) { // If I am a wizard?
+	if (pLocalPC->GetClass() == Wizard) { // If I am a wizard?
 		PlayerClient* me = pLocalPlayer;
 		EQ_Spell* pSpell = GetSpellByName("Translocate");
 		if (!MyTarget()) {
@@ -704,12 +704,9 @@ bool UseClickyByItemName(const char* pItem)
 {
 	if (FindItemCountByName(pItem)) {
 		if (ItemClient* item = FindItemByName(pItem)) {
-			if (ItemDefinition* pItemInfo = GetItemFromContents(item)) {
-				if (EQ_Spell* itemSpell = GetSpellByID(pItemInfo->Clicky.SpellID)) {
-					if (pSpellMgr && ItemReady(pItemInfo->Name)) {
-						UseItem(pItemInfo->Name);
-						return true;
-					}
+			if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
+				if (ItemReady(item->GetName())) {
+					UseItem(item->GetName());
 				}
 			}
 		}
@@ -720,12 +717,10 @@ bool UseClickyByItemName(const char* pItem)
 bool IsClickyReadyByItemName(const char* pItem)
 {
 	if (FindItemCountByName(pItem)) {
-		if (ItemClient* pItemContents = FindItemByName(pItem)) {
-			if (ItemDefinition* pItemInfo = GetItemFromContents(pItemContents)) {
-				if (EQ_Spell* itemSpell = GetSpellByID(pItemInfo->Clicky.SpellID)) {
-					if (pSpellMgr && ItemReady(pItemInfo->Name)) {
-						return true;
-					}
+		if (ItemClient* item = FindItemByName(pItem)) {
+			if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
+				if (ItemReady(item->GetName())) {
+					return true;
 				}
 			}
 		}
@@ -765,18 +760,16 @@ void StatusItemCheck(const char* szItemName)
 
 inline bool InGame()
 {
-	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetPcProfile());
+	return(GetGameState() == GAMESTATE_INGAME && pLocalPC && pLocalPlayer && GetPcProfile());
 }
 
 CAltAbilityData* AltAbility(const std::string szAltName)
 {
-	if (PlayerClient* me = pLocalPlayer) {
-		for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-			if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), me->Level)) {
-				if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
-					if (!_stricmp(szAltName.c_str(), pName)) {
-						return pAbility;
-					}
+	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
+		if (CAltAbilityData* pAbility = GetAAById(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
+			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
+				if (!_stricmp(szAltName.c_str(), pName)) {
+					return pAbility;
 				}
 			}
 		}
@@ -818,7 +811,7 @@ bool AltAbilityReady(const char* szLine, const unsigned long TargetID)
 	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Invis(me)) return false;
 
 	for (auto nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), me->Level)) {
+		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szLine, pName)) {
 					if (pAbility->SpellID != -1) {
@@ -850,13 +843,7 @@ int GroupSize()
 
 PlayerClient* MyTarget()
 {
-	if (!pTarget) {
-		return nullptr;
-	}
-	if (PlayerClient* target = pTarget) {
-		return target;
-	}
-	return nullptr;
+	return pTarget;
 }
 
 unsigned int MyTargetID()
@@ -866,10 +853,7 @@ unsigned int MyTargetID()
 
 PlayerClient* Me()
 {
-	if (PlayerClient* me = pLocalPlayer) {
-		return me;
-	}
-	return nullptr;
+	return pLocalPlayer;
 }
 
 bool ImDucking()
@@ -879,7 +863,7 @@ bool ImDucking()
 
 bool Casting()
 {
-	return GetCharInfo()->pSpawn->CastingData.IsCasting();
+	return pLocalPlayer->CastingData.IsCasting();
 }
 
 bool Moving(PlayerClient* pSpawn)
@@ -891,12 +875,12 @@ bool Moving(PlayerClient* pSpawn)
 bool ItemReady(const char* szItem)
 {
 	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
-	if (GetPcProfile()->Class != Bard && Casting()) return false;
+	if (pLocalPC->GetClass() != Bard && Casting()) return false;
 	if (ItemClient* item = FindItemByName(szItem, true)) {
 		if (ItemDefinition* pIteminf = GetItemFromContents(item)) {
 			if (pIteminf->Clicky.TimerID != -1) {
 				uint32_t timer = GetItemTimer(item);
-				if (timer == 0 && !Moving(GetCharInfo()->pSpawn))
+				if (timer == 0 && !Moving(pLocalPlayer))
 					return true;
 			}
 			else if (pIteminf->Clicky.SpellID != -1)
@@ -926,12 +910,7 @@ bool IsSpellBookOpen() {
 
 bool IAmDead()
 {
-	if (PlayerClient* Me = GetCharInfo()->pSpawn) {
-		if (Me->RespawnTimer) {
-			return true;
-		}
-	}
-	return false;
+	return pLocalPlayer && pLocalPlayer->RespawnTimer;
 }
 
 bool Invis(PlayerClient* pSpawn)
