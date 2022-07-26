@@ -9,27 +9,30 @@ Usage:
 PreSetup("MQ2Relocate");
 PLUGIN_VERSION(2.0);
 
-ALTABILITY* AltAbility(std::string szAltName);
-SPAWNINFO* MyTarget();
+constexpr auto PLUGINMSG = "\aw[\agRelocate\aw]\ao::\aw ";
+
+CAltAbilityData* AltAbility(const std::string szAltName);
+PlayerClient* MyTarget();
 unsigned int MyTargetID();
-SPAWNINFO* Me();
-void ReloCmd(SPAWNINFO* pChar, char* szLine);
-void StatusItemCheck(char* szItemName);
-void TransloCmd(SPAWNINFO* pChar, char* szLine);
-void UseItem(char* pItem);
+PlayerClient* Me();
+void ReloCmd(PlayerClient* pChar, char* szLine);
+void StatusItemCheck(const char* szItemName);
+void TransloCmd(PlayerClient* pChar, const char* szLine);
+void UseItem(const char* pItem);
 bool HaveAlias(const std::string& aliasName);
-bool UseClickyByItemName(char* pItem);
+bool UseClickyByItemName(const char* pItem);
 bool IAmDead();
-bool Invis(SPAWNINFO* pSpawn);
-bool IsClickyReadyByItemName(char* pItem);
+bool Invis(PlayerClient* pSpawn);
+bool IsClickyReadyByItemName(const char* pItem);
 bool IsSpellBookOpen();
 bool IsTargetPlayer();
-bool ItemReady(char* szItem);
+bool ItemReady(const char* szItem);
 bool ImDucking();
-bool AltAbilityReady(const char*, unsigned long TargetID = 0);
+bool AltAbilityReady(const char*, const unsigned long TargetID = 0);
 bool Casting();
-bool DiscReady(SPELL*);
-bool Moving(SPAWNINFO* pSpawn);
+bool CastingCheck();
+bool DiscReady(EQ_Spell*);
+bool Moving(PlayerClient* pSpawn);
 inline bool InGame();
 int GroupSize();
 
@@ -54,45 +57,39 @@ int iPulse = 0;
 int iPulseDelay = 75;
 int GlobalSkillDelay = 600;
 
-void ReloCmd(SPAWNINFO* pChar, char* szLine)
+void ReloCmd(PlayerClient* pChar, char* szLine)
 {
 	if (!InGame())
 		return;
 	//Get our parameters
-	CHAR Arg[MAX_STRING] = { 0 };
+	char Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
 	if (strlen(Arg)) {
-		char temp[MAX_STRING] = { 0 };
-		if (GetPcProfile()->Class == Bard && IsPluginLoaded("mq2twist")) { // We already verify that GetCharInfo2 exists in our InGame(), so only checking its member here.
-			sprintf_s(temp, "/multiline ; /twist off ; /timed 5 ; /useitem ");
-			WriteChatf("\agWe are going to /twist off, to use our relocate items.");
-		}
-		else {
-			sprintf_s(temp, "/useitem ");
-		}
+		char temp[MAX_STRING] = "/useitem ";
+
 		if (!_stricmp(Arg, "help")) { // Output available arguments for /relocate
-			WriteChatf("Welcome to MQ2Relocate!");
-			WriteChatf("By \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.");
-			WriteChatf("\agValid Relocate options are:\aw");
-			WriteChatf("/relocate \agair\aw, \agfire\aw, and \agstone\aw for \ayZephyr's Lamp\aw.");
-			WriteChatf("/relocate \agstonebrunt\aw, \agdreadlands\aw, \aggreatdivide\aw, \agnek\aw, \agnro\aw, and \agskyfire\aw for \ayZueria Slide\aw.");
-			WriteChatf("/relocate \agpok\aw for \ayPlane of Knowledge\aw.");
-			WriteChatf("/relocate \aggate\aw to use your \ayGate AA\aw or \ayTranslocation Potion\aw.");
-			WriteChatf("/relocate \agorigin\aw to use your \ayOrigin AA\aw.");
-			WriteChatf("/relocate \agbrell\aw to use your \ayMark of Brell\aw.");
-			WriteChatf("/relocate \agbronze\aw to use your \ayHarbinger's Staff\aw.");
-			WriteChatf("/relocate \aganchor\aw to use your \ayPrimary \awor \aySecondary Anchor\aw.");
-			WriteChatf("/relocate \aganchor1\aw to use your \ayPrimary Anchor\aw.");
-			WriteChatf("/relocate \aganchor2\aw to use your \aySecondary Anchor\aw.");
-			WriteChatf("/relocate \agfellow\aw or \agfellowship\aw to use your \ayFellowship Insignia\aw.");
-			WriteChatf("/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.");
-			WriteChatf("/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
-			WriteChatf("/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
-			WriteChatf("/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.");
-			WriteChatf("/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.");
-			WriteChatf("\agValid Translocate options are:\aw");
-			WriteChatf("\ay/translocate\aw to \ayTranslocate\aw your target to their bind.");
-			WriteChatf("\ay/translocate\aw \arRedBot\aw to \ayTranslocate\aw \arRedBot\aw to their bind.");
+			WriteChatf("%sWelcome to MQ2Relocate!", PLUGINMSG);
+			WriteChatf("%sBy \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.", PLUGINMSG);
+			WriteChatf("%s\agValid Relocate options are:\aw", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agair\aw, \agfire\aw, and \agstone\aw for \ayZephyr's Lamp\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agstonebrunt\aw, \agdreadlands\aw, \aggreatdivide\aw, \agnek\aw, \agnro\aw, and \agskyfire\aw for \ayZueria Slide\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agpok\aw for \ayPlane of Knowledge\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \aggate\aw to use your \ayGate AA\aw or \ayTranslocation Potion\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agorigin\aw to use your \ayOrigin AA\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agbrell\aw to use your \ayMark of Brell\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agbronze\aw to use your \ayHarbinger's Staff\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \aganchor\aw to use your \ayPrimary \awor \aySecondary Anchor\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \aganchor1\aw to use your \ayPrimary Anchor\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \aganchor2\aw to use your \aySecondary Anchor\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agfellow\aw or \agfellowship\aw to use your \ayFellowship Insignia\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.", PLUGINMSG);
+			WriteChatf("%s\ar/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.", PLUGINMSG);
+			WriteChatf("%s\agValid Translocate options are:\aw", PLUGINMSG);
+			WriteChatf("%s\ay/translocate\aw to \ayTranslocate\aw your target to their bind.", PLUGINMSG);
+			WriteChatf("%s\ay/translocate\aw \arRedBot\aw to \ayTranslocate\aw \arRedBot\aw to their bind.", PLUGINMSG);
 			return;
 		}
 		if (!_stricmp(Arg, "air") || !_stricmp(Arg, "fire") || !_stricmp(Arg, "stone")) { // Use Wishing Lamp:
@@ -101,14 +98,14 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			char fire[64] = "Wishing Lamp: Palace of Embers";
 			char stone[64] = "Wishing Lamp: The Stone Demesne";
 			if (!FindItemByName(reloClicky)) {
-				WriteChatf("You do not appear to have a Wishing Lamp.");
+				WriteChatf("%s\arYou do not appear to have a Wishing Lamp.", PLUGINMSG);
 				return;
 			}
 			if (!_stricmp(Arg, "air")) {
 				if (FindItemByName(air)) {
 					strcat_s(temp, air);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", air);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, air);
 				}
 				else {
 					bAmConverting = true;
@@ -119,7 +116,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(fire)) {
 					strcat_s(temp, fire);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", fire);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, fire);
 				}
 				else {
 					bAmConverting = true;
@@ -130,7 +127,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(stone)) {
 					strcat_s(temp, stone);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", stone);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, stone);
 				}
 				else {
 					bAmConverting = true;
@@ -148,14 +145,14 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			char nro[64] = "Zueria Slide: North Ro";
 			char skyfire[64] = "Zueria Slide: Skyfire";
 			if (!FindItemByName(reloClicky)) {
-				WriteChatf("You do not appear to have a Zueria Slide.");
+				WriteChatf("%s\arYou do not appear to have a Zueria Slide.", PLUGINMSG);
 				return;
 			}
 			if (!_stricmp(Arg, "stonebrunt")) {
 				if (FindItemByName(stonebrunt)) {
 					strcat_s(temp, stonebrunt);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", stonebrunt);
+					WriteChatf("%s\arRelocating with: \ag%s ", stonebrunt, PLUGINMSG);
 				}
 				else {
 					bAmConverting = true;
@@ -166,7 +163,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(dreadlands)) {
 					strcat_s(temp, dreadlands);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", dreadlands);
+					WriteChatf("%s\arRelocating with: \ag%s ", dreadlands, PLUGINMSG);
 				}
 				else {
 					bAmConverting = true;
@@ -177,7 +174,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(greatdivide)) {
 					strcat_s(temp, greatdivide);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", greatdivide);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, greatdivide);
 				}
 				else {
 					bAmConverting = true;
@@ -188,7 +185,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(nek)) {
 					strcat_s(temp, nek);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", nek);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, nek);
 				}
 				else {
 					bAmConverting = true;
@@ -199,7 +196,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(nro)) {
 					strcat_s(temp, nro);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", nro);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, nro);
 				}
 				else {
 					bAmConverting = true;
@@ -210,7 +207,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				if (FindItemByName(skyfire)) {
 					strcat_s(temp, skyfire);
 					EzCommand(temp);
-					WriteChatf("Relocating with: \ag%s ", skyfire);
+					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, skyfire);
 				}
 				else {
 					bAmConverting = true;
@@ -233,7 +230,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 				sprintf_s(reloClicky, "The Fabled Binden Concerrentia");
 			}
 			else {
-				WriteChatf("\aoDOH!\ar You don't have a \aypok \arclicky that is ready!");
+				WriteChatf("%s\aoDOH!\ar You don't have a \aypok \arclicky that is ready!", PLUGINMSG);
 				return;
 			}
 			if (FindItemByName(reloClicky)) {
@@ -243,7 +240,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else {
 				// This else for error checking and should never happen.
-				WriteChatf("I don't have a %s", reloClicky);
+				WriteChatf("%s\arI don't have a %s", PLUGINMSG, reloClicky);
 			}
 			return;
 		}
@@ -262,7 +259,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					canGatePotion = true;
 				}
 				else {
-					WriteChatf("\arI don't seem to have the ability to gate, nor do you have a gate potion!\aw");
+					WriteChatf("%s\arI don't seem to have the ability to gate, nor do you have a gate potion!\aw", PLUGINMSG);
 				}
 			}
 			return;
@@ -273,19 +270,19 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					canOriginAA = true;
 				}
 				else {
-					WriteChatf("\ayOrigin \arisn't ready right now\aw.");
+					WriteChatf("%s\ayOrigin \arisn't ready right now\aw.", PLUGINMSG);
 				}
 				if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
 					if (IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 						UseClickyByItemName("Sceptre of Draconic Calling");
 					}
 					else {
-						WriteChatf("\aySceptre of Draconic Calling \arisn't ready right now\aw!");
+						WriteChatf("%s\aySceptre of Draconic Calling \arisn't ready right now\aw!", PLUGINMSG);
 					}
 				}
 			}
 			else {
-				WriteChatf("\arWe don't have a way to Origin at the moment\ar.");
+				WriteChatf("%s\arWe don't have a way to Origin at the moment\ar.");
 			}
 			return;
 		}
@@ -313,7 +310,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					UseClickyByItemName(reloClicky);
 			}
 			else {
-				WriteChatf("\arDOH!\aw I don't have an anchor clicky that is ready");
+				WriteChatf("%s\arDOH!\aw I don't have an anchor clicky that is ready", PLUGINMSG);
 			}
 			return;
 		}
@@ -331,19 +328,19 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					if (pChar->HideMode) { // Fellowship insignia requires being visible to use
 						MakeMeVisible(GetCharInfo()->pSpawn, "");
 					}
-					if (pLocalPlayer && ((SPAWNINFO*)pLocalPlayer)->Campfire) {
+					if (pLocalPlayer && pLocalPlayer->Campfire) {
 						UseClickyByItemName("Fellowship Registration Insignia");
 					}
 					else {
-							WriteChatf("\arYou do not have a campfire up\aw.");
+							WriteChatf("%s\arYou do not have a campfire up\aw.", PLUGINMSG);
 					}
 				}
 				else {
-					WriteChatf("\arFellowship Registration Insignia is not ready!\aw");
+					WriteChatf("%s\arFellowship Registration Insignia is not ready!\aw", PLUGINMSG);
 				}
 			}
 			else {
-				WriteChatf("\arYou do not have a Fellowship Registration Insigna!\aw");
+				WriteChatf("%s\arYou do not have a Fellowship Registration Insigna!\aw", PLUGINMSG);
 			}
 			return;
 		}
@@ -353,11 +350,11 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					canLobbyAA = true;
 				}
 				else {
-					WriteChatf("\ayThrone of Heroes \arisn't ready right now\aw.");
+					WriteChatf("%s\ayThrone of Heroes \arisn't ready right now\aw.", PLUGINMSG);
 				}
 			}
 			else {
-				WriteChatf("\arI don't have the \ayThrone of Heroes \arAA\aw!");
+				WriteChatf("%s\arI don't have the \ayThrone of Heroes \arAA\aw!", PLUGINMSG);
 			}
 			return;
 		}
@@ -367,11 +364,11 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					canHarmonicAA = true;
 				}
 				else {
-					WriteChatf("\ayHarmonic Dissonance \arisn't ready right now\aw.");
+					WriteChatf("%s\ayHarmonic Dissonance \arisn't ready right now\aw.", PLUGINMSG);
 				}
 			}
 			else {
-				WriteChatf("\arI don't have the \ayHarmonic Dissonance \arAA\aw!");
+				WriteChatf("%s\arI don't have the \ayHarmonic Dissonance \arAA\aw!", PLUGINMSG);
 			}
 			return;
 		}
@@ -401,7 +398,7 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			}
 
 			if (!canEvacAA && !canGroupEvacAA) {
-				WriteChatf("\arI don't seem to have the ability to evac!\aw");
+				WriteChatf("%s\arI don't seem to have the ability to evac!\aw", PLUGINMSG);
 			}
 
 			return;
@@ -412,11 +409,11 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 					canTeleportAA = true;
 				}
 				else {
-					WriteChatf("\ayTeleport \arisn't ready right now\aw.");
+					WriteChatf("%s\ayTeleport \arisn't ready right now\aw.", PLUGINMSG);
 				}
 			}
 			else {
-				WriteChatf("\arI don't have the \ayTeleport \arAA\aw!");
+				WriteChatf("%s\arI don't have the \ayTeleport \arAA\aw!", PLUGINMSG);
 			}
 			return;
 		}
@@ -425,86 +422,84 @@ void ReloCmd(SPAWNINFO* pChar, char* szLine)
 			return;
 		}
 	}
-	WriteChatf("\arYou didn't provide a valid option for /relocate.\aw");
-	WriteChatf("\arPlease do \"/relocate help\" for more information.\aw");
+	WriteChatf("%s\arYou didn't provide a valid option for /relocate.\aw", PLUGINMSG);
+	WriteChatf("%s\arPlease do \"/relocate help\" for more information.\aw", PLUGINMSG);
 	return;
 }
 
-void TransloCmd(SPAWNINFO* pChar, char* szLine)
+void TransloCmd(PlayerClient* pChar, char* szLine)
 {
 	if (!InGame())
 		return;
-	CHAR Arg[MAX_STRING] = { 0 };
+	char Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
 
 	if (!_stricmp(Arg, "help")) {
-		WriteChatf("\agValid Translocate options are:\aw");
-		WriteChatf("\ay/translocate\aw \arRedBot\aw to Translocate \arRedBot\aw to their bind.");
+		WriteChatf("%s\agValid Translocate options are:\aw", PLUGINMSG);
+		WriteChatf("%s\ay/translocate\aw \arRedBot\aw to Translocate \arRedBot\aw to their bind.", PLUGINMSG);
 		return;
 	}
 
 	if (GetPcProfile()->Class == Wizard) { // If I am a wizard?
+		PlayerClient* me = GetCharInfo()->pSpawn;
+		EQ_Spell* pSpell = GetSpellByName("Translocate");
 		if (!MyTarget()) {
 			if (strlen(Arg) == 0) {
-				WriteChatf(static_cast<char*>("\arPlease provide a target for translocate\aw."));
-				WriteChatf(static_cast<char*>("\arYou can physically target a player, or provide a name like: \ag/translocate RedBot\aw."));
+				WriteChatf("%s\arPlease provide a target for translocate\aw.", PLUGINMSG);
+				WriteChatf("%s\arYou can physically target a player, or provide a name like: \ag/translocate RedBot\aw.", PLUGINMSG);
 				return;
 			}
 			else {
 				//Let us see if we can find the target that was provided as an argument.
-				SPAWNINFO* desiredTarget = (SPAWNINFO*)GetSpawnByName(Arg);
-				SPAWNINFO* me = GetCharInfo()->pSpawn;
-				SPELL* pSpell = GetSpellByName("Translocate");
+				PlayerClient* desiredTarget = GetSpawnByName(Arg);
 				bool haveAA = false;
 				if (pSpell && AltAbility(pSpell->Name) && AltAbility(pSpell->Name)->CurrentRank > 0)
 					haveAA = true;
 				if (!desiredTarget || !haveAA || !me) {
 					if (!desiredTarget)
-						WriteChatf("\arI can't find a player with the name \ay%s\aw", Arg);
+						WriteChatf("%s\arI can't find a player with the name \ay%s\aw", Arg);
 					if (!haveAA)
-						WriteChatf("\arI don't have the AA Translocate");
+						WriteChatf("%s\arI don't have the AA Translocate");
 					if (!me)
-						WriteChatf("\arI'm not in game, knock that off!");
+						WriteChatf("%s\arI'm not in game, knock that off!");
 					return;
 				}
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("\arIt seems \ay%s\aw is out of range of \ay%s\aw.", Arg, pSpell->Name); // Double check this spits out both %s
-					return;
+					WriteChatf("%s\arIt seems \ay%s\aw is out of range of \ay%s\aw.", PLUGINMSG, Arg, pSpell->Name);
 				}
 
 				pTarget = desiredTarget;
 
 				if (!MyTarget()) {
-					WriteChatf("\arWe do not have a target.");
+					WriteChatf("%s\arWe do not have a target.", PLUGINMSG);
 				}
 				else if (MyTarget() && MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("\ay%s\aw \aris not a Player!\aw", MyTarget()->Type);
+					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Type);
 				}
 				else if (MyTargetID() == Me()->SpawnID) {
-					WriteChatf("\arYou can't translocate yourself, knock it off!");
+					WriteChatf("%s\arYou can't translocate yourself, knock it off!", PLUGINMSG);
 				}
 				else {
 					canTranslocate = true;
 				}
 				return;
 			}
-		} else {
+		}
+		else {
 			if (strlen(Arg) == 0) {
-				SPAWNINFO* desiredTarget = (SPAWNINFO*)GetSpawnByName(MyTarget()->Name);
-				SPAWNINFO* me = GetCharInfo()->pSpawn;
-				SPELL* pSpell = GetSpellByName("Translocate");
+				PlayerClient* desiredTarget = GetSpawnByName(MyTarget()->Name);
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("\arIt seems \ay%s\aw \aris out of range of \ay%s\aw.", MyTarget()->Name, pSpell->Name);
+					WriteChatf("%s\arIt seems \ay%s\aw \aris out of range of \ay%s\aw.", MyTarget()->Name, pSpell->Name, PLUGINMSG);
 					return;
 				}
 
 				if (MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("\ay%s\aw \aris not a Player!\aw", MyTarget()->Name);
+					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Name);
 					return;
 				}
 
 				if (MyTargetID() == Me()->SpawnID) {
-					WriteChatf("\arYou can't translocate yourself, knock it off!\aw");
+					WriteChatf("%s\arYou can't translocate yourself, knock it off!\aw", PLUGINMSG);
 					return;
 				}
 
@@ -512,38 +507,36 @@ void TransloCmd(SPAWNINFO* pChar, char* szLine)
 				return;
 			}
 			else {
-				SPAWNINFO* desiredTarget = (SPAWNINFO*)GetSpawnByName(Arg);
-				SPAWNINFO* me = GetCharInfo()->pSpawn;
-				SPELL* pSpell = GetSpellByName("Translocate");
+				PlayerClient* desiredTarget = GetSpawnByName(Arg);
 				if (!desiredTarget) {
-					WriteChatf("\arI can't find a player with the name >>> \ay%s\ar <<<\aw.", Arg);
+					WriteChatf("%s\arI can't find a player with the name >>> \ay%s\ar <<<\aw.", PLUGINMSG, Arg);
 					return;
 				}
 
 				if (desiredTarget && desiredTarget->Type != SPAWN_PLAYER) {
-					WriteChatf("\ay%s\aw \aris not a player.\aw", desiredTarget);
+					WriteChatf("%s\ay%s\aw \aris not a player.\aw", PLUGINMSG, desiredTarget);
 					return;
 				}
 
 				if (desiredTarget->SpawnID == Me()->SpawnID) {
-					WriteChatf("\arYou can't translocate yourself, knock it off!\aw");
+					WriteChatf("%s\arYou can't translocate yourself, knock it off!\aw", PLUGINMSG);
 					return;
 				}
 
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("\arIt seems \ay%s\ar is out of range of \ay%s\aw.", Arg, pSpell->Name);
+					WriteChatf("%s\arIt seems \ay%s\ar is out of range of \ay%s\aw.", PLUGINMSG, Arg, pSpell->Name);
 					return;
 				}
 
 				pTarget = desiredTarget;
 
 				if (!MyTarget()) {
-					WriteChatf("We do not have a target.");
+					WriteChatf("We do not have a target.", PLUGINMSG);
 					return;
 				}
 
 				if (MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("\ay%s\aw \aris not a Player!\aw", MyTarget()->Name);
+					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Name);
 					return;
 				}
 
@@ -553,7 +546,7 @@ void TransloCmd(SPAWNINFO* pChar, char* szLine)
 		}
 
 	}
-	WriteChatf("\arYou are not a Wizard! No Translocate for you\aw!");
+	WriteChatf("%s\arYou are not a Wizard! No Translocate for you\aw!", PLUGINMSG);
 }
 
 bool HaveAlias(const std::string& aliasName) {
@@ -567,12 +560,12 @@ bool HaveAlias(const std::string& aliasName) {
 PLUGIN_API void InitializePlugin()
 {
 	if (HaveAlias("/relocate")) { // Check our aliases
-		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
+		WriteChatf("%s\arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.", PLUGINMSG);
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 
 	if (HaveAlias("/translocate")) { // Check our aliases
-		WriteChatf("\ar[\a-tMQ2Relocate\ar]\ao:: \arIt appears you already have an Alias for \ap/translocate\ar  please type \"\ay/alias /translocate delete\ar\" then reload this plugin.");
+		WriteChatf("%s\arIt appears you already have an Alias for \ap/translocate\ar  please type \"\ay/alias /translocate delete\ar\" then reload this plugin.", PLUGINMSG);
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 	else {
@@ -604,12 +597,13 @@ PLUGIN_API void OnPulse()
 
 	if (ImDucking() || Casting() || Moving(GetCharInfo()->pSpawn)) return;
 
+
 	char temp[MAX_STRING] = "";
 
 	if (bAmConverting) {
 		if (!FindItemByName(convertoption) && FindItemByName(reloClicky)) {
 			sprintf_s(temp, "/convertitem %s", convertoption);
-			WriteChatf("Converting Item"); // Debug purposes
+			WriteChatf("%sConverting Item", PLUGINMSG); // Debug purposes
 			EzCommand(temp);
 		}
 		else {
@@ -623,13 +617,13 @@ PLUGIN_API void OnPulse()
 		// This is where I trigger the usage of the converted item.
 		sprintf_s(temp, "/useitem \"%s\"", convertoption);
 		EzCommand(temp);
-		WriteChatf("Relocating with: \ag%s\aw", convertoption);
+		WriteChatf("%sRelocating with: \ag%s\aw", PLUGINMSG, convertoption);
 		needsUsing = false; // Turn off needsusing, because i've used it.
 		sprintf_s(convertoption, ""); // Clear the convertitem string so that it's blank and ready for modification again.
 	}
 
-	if (canGateAA && AltAbilityReady("Gate")) {
-		WriteChatf("Relocating with: \ayGate AA\aw.");
+	if (canGateAA) {
+		WriteChatf("%sRelocating with: \ayGate AA\aw.", PLUGINMSG);
 		EzCommand("/alt act 1217");
 		canGateAA = false;
 	}
@@ -643,33 +637,33 @@ PLUGIN_API void OnPulse()
 		}
 	}
 
-	if (canOriginAA && AltAbilityReady("Origin")) {
-		WriteChatf("Relocating with: \ayOrigin AA\aw.");
+	if (canOriginAA) {
+		WriteChatf("%sRelocating with: \ayOrigin AA\aw.", PLUGINMSG);
 		EzCommand("/alt act 331");
 		canOriginAA = false;
 	}
 
-	if (canLobbyAA && AltAbilityReady("Throne of Heroes")) {
-		WriteChatf("Relocating to \agGuild Lobby\aw with: \ayThrone of Heroes AA\aw.");
+	if (canLobbyAA) {
+		WriteChatf("%sRelocating to \agGuild Lobby\aw with: \ayThrone of Heroes AA\aw.", PLUGINMSG);
 		EzCommand("/alt act 511");
 		canLobbyAA = false;
 	}
 
-	if (canHarmonicAA && AltAbilityReady("Harmonic Dissonance")) {
-		WriteChatf("Relocating to \agTheater of Blood\aw with: \ayHarmonic Dissonance AA\aw.");
+	if (canHarmonicAA) {
+		WriteChatf("%sRelocating to \agTheater of Blood\aw with: \ayHarmonic Dissonance AA\aw.", PLUGINMSG);
 		EzCommand("/alt act 574");
 		canHarmonicAA = false;
 	}
 
 	if (canEvacAA) { // Check each evac AA
 		if (AltAbilityReady("Steathly Getaway")) {
-			WriteChatf("Self Evac with: \ayStealthy Getaway AA\aw.");
+			WriteChatf("%sSelf Evac with: \ayStealthy Getaway AA\aw.", PLUGINMSG);
 			EzCommand("/alt act 789");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Abscond")) {
-			WriteChatf("Self Evac with: \ayAbscond AA\aw.");
+			WriteChatf("%sSelf Evac with: \ayAbscond AA\aw.", PLUGINMSG);
 			EzCommand("/alt act 490");
 			canEvacAA = false;
 		}
@@ -681,40 +675,39 @@ PLUGIN_API void OnPulse()
 		}
 
 		if (AltAbilityReady("Levant")) {
-			WriteChatf("Self Evac with: \ayLevant AA\aw.");
+			WriteChatf("%sSelf Evac with: \ayLevant AA\aw.", PLUGINMSG);
 			EzCommand("/alt act 2899");
 			canEvacAA = false;
 		}
 	}
+
 	if (canGroupEvacAA) { // Check each evac AA
-		if (AltAbilityReady("Exodus")) {
-			WriteChatf("Group Evac with: \ayExodus AA\aw.");
-			EzCommand("/alt act 43");
-			canGroupEvacAA = false;
-		}
+		WriteChatf("%sGroup Evac with: \ayExodus AA\aw.", PLUGINMSG);
+		EzCommand("/alt act 43");
+		canGroupEvacAA = false;
 	}
 
-	if (canTranslocate && AltAbilityReady("Translocate")) {
-		WriteChatf("Translocating \ay%s\aw with: \ayTranslocate AA\aw.", ((SPAWNINFO*)pTarget)->Name);
+	if (canTranslocate) {
+		WriteChatf("%sTranslocating \ay%s\aw with: \ayTranslocate AA\aw.", PLUGINMSG, pTarget->Name);
 		EzCommand("/alt act 9703");
 		canTranslocate = false;
 	}
 
-	if (canTeleportAA && AltAbilityReady("Teleport")) {
-		WriteChatf("Teleporting surrounding allies with: \ayTeleport AA\aw.");
+	if (canTeleportAA) {
+		WriteChatf("%sTeleporting surrounding allies with: \ayTeleport AA\aw.", PLUGINMSG);
 		EzCommand("/alt act 9704");
 		canTeleportAA = false;
 	}
 }
 
-bool UseClickyByItemName(char* pItem)
+bool UseClickyByItemName(const char* pItem)
 {
 	if (FindItemCountByName(pItem)) {
-		if (PCONTENTS item = FindItemByName(pItem)) {
-			if (PITEMINFO pIteminf = GetItemFromContents(item)) {
-				if ((PVOID)&GetItemFromContents(item)->Clicky) {
-					if (pSpellMgr && ItemReady(pIteminf->Name)) {
-						UseItem(pIteminf->Name);
+		if (ItemClient* item = FindItemByName(pItem)) {
+			if (ItemDefinition* pItemInfo = GetItemFromContents(item)) {
+				if (EQ_Spell* itemSpell = GetSpellByID(pItemInfo->Clicky.SpellID)) {
+					if (pSpellMgr && ItemReady(pItemInfo->Name)) {
+						UseItem(pItemInfo->Name);
 						return true;
 					}
 				}
@@ -724,12 +717,12 @@ bool UseClickyByItemName(char* pItem)
 	return false;
 }
 
-bool IsClickyReadyByItemName(char* pItem)
+bool IsClickyReadyByItemName(const char* pItem)
 {
 	if (FindItemCountByName(pItem)) {
-		if (CONTENTS* pItemContents = FindItemByName(pItem)) {
-			if (ITEMINFO* pItemInfo = GetItemFromContents(pItemContents)) {
-				if ((void*)&GetItemFromContents(pItemContents)->Clicky) {
+		if (ItemClient* pItemContents = FindItemByName(pItem)) {
+			if (ItemDefinition* pItemInfo = GetItemFromContents(pItemContents)) {
+				if (EQ_Spell* itemSpell = GetSpellByID(pItemInfo->Clicky.SpellID)) {
 					if (pSpellMgr && ItemReady(pItemInfo->Name)) {
 						return true;
 					}
@@ -742,7 +735,7 @@ bool IsClickyReadyByItemName(char* pItem)
 
 bool IsTargetPlayer()
 {
-	if (SPAWNINFO* target = (SPAWNINFO*)pTarget) {
+	if (PlayerClient* target = pTarget) {
 		if (target->Type == SPAWN_PLAYER) {
 			return true;
 		}
@@ -759,7 +752,7 @@ PLUGIN_API void SetGameState(unsigned long GameState)
 	}
 }
 
-void StatusItemCheck(char* szItemName)
+void StatusItemCheck(const char* szItemName)
 {
 	if (FindItemByName(szItemName)) {
 		if (IsClickyReadyByItemName(szItemName)) {
@@ -767,11 +760,11 @@ void StatusItemCheck(char* szItemName)
 			return;
 		}
 		else {
-			WriteChatf("\ay%s \aris not ready\aw!", szItemName);
+			WriteChatf("%s\ay%s \aris not ready\aw!", PLUGINMSG, szItemName);
 			return;
 		}
 	}
-	WriteChatf("\arYou do not have a \ay%s\aw!", szItemName);
+	WriteChatf("%s\arYou do not have a \ay%s\aw!", PLUGINMSG, szItemName);
 	return;
 }
 
@@ -780,14 +773,14 @@ inline bool InGame()
 	return(GetGameState() == GAMESTATE_INGAME && GetCharInfo() && GetCharInfo()->pSpawn && GetPcProfile());
 }
 
-ALTABILITY* AltAbility(std::string szAltName)
+CAltAbilityData* AltAbility(const std::string szAltName)
 {
 	int level = -1;
-	if (SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer) {
+	if (PlayerClient* pMe = pLocalPlayer) {
 		level = pMe->Level;
 	}
-	for (unsigned long nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (ALTABILITY* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
+	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
+		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szAltName.c_str(), pName)) {
 					return pAbility;
@@ -798,23 +791,51 @@ ALTABILITY* AltAbility(std::string szAltName)
 	return nullptr;
 }
 
-bool AltAbilityReady(const char* szLine, unsigned long TargetID)
-{
-	if (!InGame() || IsSpellBookOpen() || IAmDead() || Casting()) return false;
-	SPAWNINFO* me = GetCharInfo()->pSpawn;
+void BardStopSinging() {
+	if (Me()->GetClass() == Bard) {
+		WriteChatf("stop");
+		EzCommand("/stopsong");
 
-	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Casting() || Invis(me)) return false;
+		if (IsPluginLoaded("mq2twist")) {
+			WriteChatf("twist");
+			EzCommand("/twist off");
+		}
+		WriteChatf("%s\agWe are going to /stopsong and /twist off, to use our relocate items.", PLUGINMSG);
+	}
+}
+
+bool CastingCheck()
+{
+	PlayerClient* me = GetCharInfo()->pSpawn;
+	if (me->GetClass() == Bard) {
+		BardStopSinging();
+	}
+	else if (Casting()) {
+		return true;
+	}
+	return false;
+}
+
+bool AltAbilityReady(const char* szLine, const unsigned long TargetID)
+{
+	if (!InGame() || IsSpellBookOpen() || IAmDead()) return false;
+	PlayerClient* me = GetCharInfo()->pSpawn;
+
+	if (CastingCheck())
+		return false;
+
+	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Invis(me)) return false;
 	int level = -1;
 
-	if (SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer) {
+	if (PlayerClient* pMe = pLocalPlayer) {
 		level = pMe->Level;
 	}
 	for (auto nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (ALTABILITY* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
+		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szLine, pName)) {
 					if (pAbility->SpellID != -1) {
-						if (SPELL* myAltAbility = GetSpellByID(pAbility->SpellID)) {
+						if (EQ_Spell* myAltAbility = GetSpellByID(pAbility->SpellID)) {
 							//Am I in motion?
 							if (myAltAbility->CastTime && Moving(Me())) {
 								return false;
@@ -840,12 +861,12 @@ int GroupSize()
 	return 0;
 }
 
-SPAWNINFO* MyTarget()
+PlayerClient* MyTarget()
 {
 	if (!pTarget) {
 		return nullptr;
 	}
-	if (SPAWNINFO* target = (SPAWNINFO*)pTarget) {
+	if (PlayerClient* target = pTarget) {
 		return target;
 	}
 	return nullptr;
@@ -853,15 +874,12 @@ SPAWNINFO* MyTarget()
 
 unsigned int MyTargetID()
 {
-	if (pTarget) {
-		return ((SPAWNINFO*)pTarget)->SpawnID;
-	}
-	return 0;
+	return pTarget ? pTarget->SpawnID : 0;
 }
 
-SPAWNINFO* Me()
+PlayerClient* Me()
 {
-	if (SPAWNINFO* me = GetCharInfo()->pSpawn) {
+	if (PlayerClient* me = GetCharInfo()->pSpawn) {
 		return me;
 	}
 	return nullptr;
@@ -877,23 +895,21 @@ bool Casting()
 	return GetCharInfo()->pSpawn->CastingData.IsCasting();
 }
 
-bool Moving(SPAWNINFO* pSpawn)
+bool Moving(PlayerClient* pSpawn)
 {
-	if (FindSpeed(pSpawn))
-		return true;
-	else
-		return false;
+	// 0.01f gets reported when levitating
+	return FindSpeed(pSpawn) >= 0.01f;
 }
 
-bool ItemReady(char* szItem)
+bool ItemReady(const char* szItem)
 {
 	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
 	if (GetPcProfile()->Class != Bard && Casting()) return false;
-	if (CONTENTS* item = FindItemByName(szItem, true)) {
-		if (ITEMINFO* pIteminf = GetItemFromContents(item)) {
+	if (ItemClient* item = FindItemByName(szItem, true)) {
+		if (ItemDefinition* pIteminf = GetItemFromContents(item)) {
 			if (pIteminf->Clicky.TimerID != -1) {
-				unsigned long timer = GetItemTimer(item);
-				if (timer == 0 && !Moving((SPAWNINFO*)GetCharInfo()->pSpawn))
+				uint32_t timer = GetItemTimer(item);
+				if (timer == 0 && !Moving(GetCharInfo()->pSpawn))
 					return true;
 			}
 			else if (pIteminf->Clicky.SpellID != -1)
@@ -905,7 +921,7 @@ bool ItemReady(char* szItem)
 	return false;
 }
 
-void UseItem(char* pItem)
+void UseItem(const char* pItem)
 {
 	if (GlobalLastTimeUsed >= GetTickCount64()) return;
 	char temp[MAX_STRING] = "/useitem \"";
@@ -913,7 +929,7 @@ void UseItem(char* pItem)
 	char temp2[MAX_STRING] = "\"";
 	strcat_s(temp, MAX_STRING, temp2);
 	EzCommand(temp);
-	WriteChatf("Using Item: \ay%s", pItem);
+	WriteChatf("%sUsing Item: \ay%s", PLUGINMSG, pItem);
 	GlobalLastTimeUsed = GetTickCount64() + GlobalSkillDelay;
 }
 
@@ -923,7 +939,7 @@ bool IsSpellBookOpen() {
 
 bool IAmDead()
 {
-	if (SPAWNINFO* Me = GetCharInfo()->pSpawn) {
+	if (PlayerClient* Me = GetCharInfo()->pSpawn) {
 		if (Me->RespawnTimer) {
 			return true;
 		}
@@ -931,15 +947,15 @@ bool IAmDead()
 	return false;
 }
 
-bool Invis(SPAWNINFO* pSpawn)
+bool Invis(PlayerClient* pSpawn)
 {
 	return pSpawn->HideMode;
 }
 
-bool DiscReady(SPELL* pSpell)
+bool DiscReady(EQ_Spell* pSpell)
 {
 	if (!InGame()) return false;
-	unsigned long timeNow = (unsigned long)time(NULL);
+	time_t timeNow = time(NULL);
 #if !defined(ROF2EMU) && !defined(UFEMU)
 	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex, pSpell->SpellGroup) < timeNow) {
 #else
