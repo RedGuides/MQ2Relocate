@@ -11,7 +11,7 @@ PLUGIN_VERSION(2.0);
 
 #define PLUGIN_MSG "\aw[\agRelocate\aw]\ao::\aw "
 
-CAltAbilityData* AltAbility(const std::string szAltName);
+CAltAbilityData* AltAbility(const char* szAltName);
 PlayerClient* MyTarget();
 unsigned int MyTargetID();
 PlayerClient* Me();
@@ -763,12 +763,12 @@ inline bool InGame()
 	return(GetGameState() == GAMESTATE_INGAME && pLocalPC && pLocalPlayer && GetPcProfile());
 }
 
-CAltAbilityData* AltAbility(const std::string szAltName)
+CAltAbilityData* AltAbility(const char* szAltName)
 {
 	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
 		if (CAltAbilityData* pAbility = GetAAById(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
-				if (!_stricmp(szAltName.c_str(), pName)) {
+				if (!_stricmp(szAltName, pName)) {
 					return pAbility;
 				}
 			}
