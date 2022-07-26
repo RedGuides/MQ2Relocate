@@ -328,7 +328,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					if (pChar->HideMode) { // Fellowship insignia requires being visible to use
 						MakeMeVisible(GetCharInfo()->pSpawn, "");
 					}
-					if (pLocalPlayer && pLocalPlayer->Campfire) {
+					if (pLocalPlayer->Campfire) {
 						UseClickyByItemName("Fellowship Registration Insignia");
 					}
 					else {
@@ -441,7 +441,7 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 	}
 
 	if (GetPcProfile()->Class == Wizard) { // If I am a wizard?
-		PlayerClient* me = GetCharInfo()->pSpawn;
+		PlayerClient* me = pLocalPlayer;
 		EQ_Spell* pSpell = GetSpellByName("Translocate");
 		if (!MyTarget()) {
 			if (strlen(Arg) == 0) {
@@ -487,7 +487,7 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 		}
 		else {
 			if (strlen(Arg) == 0) {
-				PlayerClient* desiredTarget = GetSpawnByName(MyTarget()->Name);
+				PlayerClient* desiredTarget = MyTarget();
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
 					WriteChatf(PLUGIN_MSG "\arIt seems \ay%s\aw \aris out of range of \ay%s\aw.", MyTarget()->Name, pSpell->Name);
 					return;
@@ -569,8 +569,8 @@ PLUGIN_API void InitializePlugin()
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 	else {
-		AddCommand("/relocate", ReloCmd);
-		AddCommand("/translocate", TransloCmd);
+		AddCommand("/relocate", ReloCmd, false, true, true);
+		AddCommand("/translocate", TransloCmd, false, true, true);
 	}
 }
 
@@ -595,7 +595,7 @@ PLUGIN_API void OnPulse()
 		return;
 	}
 
-	if (ImDucking() || Casting() || Moving(GetCharInfo()->pSpawn)) return;
+	if (ImDucking() || Casting() || Moving(pLocalPlayer)) return;
 
 
 	char temp[MAX_STRING] = "";
@@ -735,12 +735,7 @@ bool IsClickyReadyByItemName(const char* pItem)
 
 bool IsTargetPlayer()
 {
-	if (PlayerClient* target = pTarget) {
-		if (target->Type == SPAWN_PLAYER) {
-			return true;
-		}
-	}
-	return false;
+	return pTarget && pTarget->Type == SPAWN_PLAYER;
 }
 
 PLUGIN_API void SetGameState(unsigned long GameState)
@@ -775,15 +770,13 @@ inline bool InGame()
 
 CAltAbilityData* AltAbility(const std::string szAltName)
 {
-	int level = -1;
-	if (PlayerClient* pMe = pLocalPlayer) {
-		level = pMe->Level;
-	}
-	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
-			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
-				if (!_stricmp(szAltName.c_str(), pName)) {
-					return pAbility;
+	if (PlayerClient* me = pLocalPlayer) {
+		for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
+			if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), me->Level)) {
+				if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
+					if (!_stricmp(szAltName.c_str(), pName)) {
+						return pAbility;
+					}
 				}
 			}
 		}
@@ -804,7 +797,7 @@ void BardStopSinging() {
 
 bool CastingCheck()
 {
-	PlayerClient* me = GetCharInfo()->pSpawn;
+	PlayerClient* me = pLocalPlayer;
 	if (me->GetClass() == Bard) {
 		BardStopSinging();
 	}
@@ -817,19 +810,15 @@ bool CastingCheck()
 bool AltAbilityReady(const char* szLine, const unsigned long TargetID)
 {
 	if (!InGame() || IsSpellBookOpen() || IAmDead()) return false;
-	PlayerClient* me = GetCharInfo()->pSpawn;
+	PlayerClient* me = pLocalPlayer;
 
 	if (CastingCheck())
 		return false;
 
 	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Invis(me)) return false;
-	int level = -1;
 
-	if (PlayerClient* pMe = pLocalPlayer) {
-		level = pMe->Level;
-	}
 	for (auto nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), level)) {
+		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), me->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (!_stricmp(szLine, pName)) {
 					if (pAbility->SpellID != -1) {
@@ -877,7 +866,7 @@ unsigned int MyTargetID()
 
 PlayerClient* Me()
 {
-	if (PlayerClient* me = GetCharInfo()->pSpawn) {
+	if (PlayerClient* me = pLocalPlayer) {
 		return me;
 	}
 	return nullptr;
