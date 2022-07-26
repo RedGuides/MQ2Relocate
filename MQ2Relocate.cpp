@@ -9,7 +9,7 @@ Usage:
 PreSetup("MQ2Relocate");
 PLUGIN_VERSION(2.0);
 
-constexpr auto PLUGINMSG = "\aw[\agRelocate\aw]\ao::\aw ";
+#define PLUGIN_MSG "\aw[\agRelocate\aw]\ao::\aw "
 
 CAltAbilityData* AltAbility(const std::string szAltName);
 PlayerClient* MyTarget();
@@ -68,28 +68,28 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 		char temp[MAX_STRING] = "/useitem ";
 
 		if (!_stricmp(Arg, "help")) { // Output available arguments for /relocate
-			WriteChatf("%sWelcome to MQ2Relocate!", PLUGINMSG);
-			WriteChatf("%sBy \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.", PLUGINMSG);
-			WriteChatf("%s\agValid Relocate options are:\aw", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agair\aw, \agfire\aw, and \agstone\aw for \ayZephyr's Lamp\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agstonebrunt\aw, \agdreadlands\aw, \aggreatdivide\aw, \agnek\aw, \agnro\aw, and \agskyfire\aw for \ayZueria Slide\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agpok\aw for \ayPlane of Knowledge\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \aggate\aw to use your \ayGate AA\aw or \ayTranslocation Potion\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agorigin\aw to use your \ayOrigin AA\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agbrell\aw to use your \ayMark of Brell\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agbronze\aw to use your \ayHarbinger's Staff\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \aganchor\aw to use your \ayPrimary \awor \aySecondary Anchor\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \aganchor1\aw to use your \ayPrimary Anchor\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \aganchor2\aw to use your \aySecondary Anchor\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agfellow\aw or \agfellowship\aw to use your \ayFellowship Insignia\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.", PLUGINMSG);
-			WriteChatf("%s\ar/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.", PLUGINMSG);
-			WriteChatf("%s\agValid Translocate options are:\aw", PLUGINMSG);
-			WriteChatf("%s\ay/translocate\aw to \ayTranslocate\aw your target to their bind.", PLUGINMSG);
-			WriteChatf("%s\ay/translocate\aw \arRedBot\aw to \ayTranslocate\aw \arRedBot\aw to their bind.", PLUGINMSG);
+			WriteChatf(PLUGIN_MSG "Welcome to MQ2Relocate!");
+			WriteChatf(PLUGIN_MSG "By \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.");
+			WriteChatf(PLUGIN_MSG "Valid \aoRelocate\ax options are:\aw");
+			WriteChatf(PLUGIN_MSG "/relocate \agair\aw, \agfire\aw, and \agstone\aw for \ayZephyr's Lamp\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agstonebrunt\aw, \agdreadlands\aw, \aggreatdivide\aw, \agnek\aw, \agnro\aw, and \agskyfire\aw for \ayZueria Slide\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agpok\aw for \ayPlane of Knowledge\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aggate\aw to use your \ayGate AA\aw or \ayTranslocation Potion\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agorigin\aw to use your \ayOrigin AA\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agbrell\aw to use your \ayMark of Brell\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agbronze\aw to use your \ayHarbinger's Staff\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aganchor\aw to use your \ayPrimary \awor \aySecondary Anchor\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aganchor1\aw to use your \ayPrimary Anchor\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aganchor2\aw to use your \aySecondary Anchor\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agfellow\aw or \agfellowship\aw to use your \ayFellowship Insignia\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.");
+			WriteChatf(PLUGIN_MSG "Valid \aoTranslocate\ax options are:\aw");
+			WriteChatf(PLUGIN_MSG "/translocate\aw to \ayTranslocate\aw your target to their bind.");
+			WriteChatf(PLUGIN_MSG "/translocate\aw \arRedBot\aw to \ayTranslocate\aw \arRedBot\aw to their bind.");
 			return;
 		}
 		if (!_stricmp(Arg, "air") || !_stricmp(Arg, "fire") || !_stricmp(Arg, "stone")) { // Use Wishing Lamp:
@@ -98,14 +98,14 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			char fire[64] = "Wishing Lamp: Palace of Embers";
 			char stone[64] = "Wishing Lamp: The Stone Demesne";
 			if (!FindItemByName(reloClicky)) {
-				WriteChatf("%s\arYou do not appear to have a Wishing Lamp.", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arYou do not appear to have a \ayWishing Lamp.");
 				return;
 			}
 			if (!_stricmp(Arg, "air")) {
 				if (FindItemByName(air)) {
 					strcat_s(temp, air);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, air);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", air);
 				}
 				else {
 					bAmConverting = true;
@@ -116,7 +116,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(fire)) {
 					strcat_s(temp, fire);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, fire);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", fire);
 				}
 				else {
 					bAmConverting = true;
@@ -127,7 +127,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(stone)) {
 					strcat_s(temp, stone);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, stone);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", stone);
 				}
 				else {
 					bAmConverting = true;
@@ -145,14 +145,14 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			char nro[64] = "Zueria Slide: North Ro";
 			char skyfire[64] = "Zueria Slide: Skyfire";
 			if (!FindItemByName(reloClicky)) {
-				WriteChatf("%s\arYou do not appear to have a Zueria Slide.", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arYou do not appear to have a Zueria Slide.");
 				return;
 			}
 			if (!_stricmp(Arg, "stonebrunt")) {
 				if (FindItemByName(stonebrunt)) {
 					strcat_s(temp, stonebrunt);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", stonebrunt, PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", stonebrunt);
 				}
 				else {
 					bAmConverting = true;
@@ -163,7 +163,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(dreadlands)) {
 					strcat_s(temp, dreadlands);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", dreadlands, PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", dreadlands);
 				}
 				else {
 					bAmConverting = true;
@@ -174,7 +174,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(greatdivide)) {
 					strcat_s(temp, greatdivide);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, greatdivide);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", greatdivide);
 				}
 				else {
 					bAmConverting = true;
@@ -185,7 +185,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(nek)) {
 					strcat_s(temp, nek);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, nek);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nek);
 				}
 				else {
 					bAmConverting = true;
@@ -196,7 +196,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(nro)) {
 					strcat_s(temp, nro);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, nro);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nro);
 				}
 				else {
 					bAmConverting = true;
@@ -207,7 +207,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				if (FindItemByName(skyfire)) {
 					strcat_s(temp, skyfire);
 					EzCommand(temp);
-					WriteChatf("%s\arRelocating with: \ag%s ", PLUGINMSG, skyfire);
+					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", skyfire);
 				}
 				else {
 					bAmConverting = true;
@@ -230,7 +230,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				sprintf_s(reloClicky, "The Fabled Binden Concerrentia");
 			}
 			else {
-				WriteChatf("%s\aoDOH!\ar You don't have a \aypok \arclicky that is ready!", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\aoDOH!\ar You don't have a \aypok \arclicky that is ready!");
 				return;
 			}
 			if (FindItemByName(reloClicky)) {
@@ -240,7 +240,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			}
 			else {
 				// This else for error checking and should never happen.
-				WriteChatf("%s\arI don't have a %s", PLUGINMSG, reloClicky);
+				WriteChatf(PLUGIN_MSG "\arI don't have a %s", reloClicky);
 			}
 			return;
 		}
@@ -259,7 +259,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					canGatePotion = true;
 				}
 				else {
-					WriteChatf("%s\arI don't seem to have the ability to gate, nor do you have a gate potion!\aw", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arI don't seem to have the ability to \aygate\ax, nor do you have a \aygate potion\ax!\aw");
 				}
 			}
 			return;
@@ -270,19 +270,19 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					canOriginAA = true;
 				}
 				else {
-					WriteChatf("%s\ayOrigin \arisn't ready right now\aw.", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "Origin \arisn't ready right now\aw.");
 				}
 				if ((GetCharInfo()->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
 					if (IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 						UseClickyByItemName("Sceptre of Draconic Calling");
 					}
 					else {
-						WriteChatf("%s\aySceptre of Draconic Calling \arisn't ready right now\aw!", PLUGINMSG);
+						WriteChatf(PLUGIN_MSG "\aySceptre of Draconic Calling \arisn't ready right now\aw!");
 					}
 				}
 			}
 			else {
-				WriteChatf("%s\arWe don't have a way to Origin at the moment\ar.");
+				WriteChatf(PLUGIN_MSG "\arWe don't have a way to \ayOrigin\ax at the moment\aw.");
 			}
 			return;
 		}
@@ -310,7 +310,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					UseClickyByItemName(reloClicky);
 			}
 			else {
-				WriteChatf("%s\arDOH!\aw I don't have an anchor clicky that is ready", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arDOH!\aw I don't have an \ayanchor\ax clicky that is ready");
 			}
 			return;
 		}
@@ -332,15 +332,15 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 						UseClickyByItemName("Fellowship Registration Insignia");
 					}
 					else {
-							WriteChatf("%s\arYou do not have a campfire up\aw.", PLUGINMSG);
+							WriteChatf(PLUGIN_MSG "\arYou do not have a campfire up\aw.");
 					}
 				}
 				else {
-					WriteChatf("%s\arFellowship Registration Insignia is not ready!\aw", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\ayFellowship Registration Insignia \aris not ready!\aw");
 				}
 			}
 			else {
-				WriteChatf("%s\arYou do not have a Fellowship Registration Insigna!\aw", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arYou do not have a Fellowship Registration Insigna!\aw");
 			}
 			return;
 		}
@@ -350,11 +350,11 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					canLobbyAA = true;
 				}
 				else {
-					WriteChatf("%s\ayThrone of Heroes \arisn't ready right now\aw.", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\ayThrone of Heroes \arisn't ready right now\aw.");
 				}
 			}
 			else {
-				WriteChatf("%s\arI don't have the \ayThrone of Heroes \arAA\aw!", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arI don't have the \ayThrone of Heroes \arAA\aw!");
 			}
 			return;
 		}
@@ -364,11 +364,11 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					canHarmonicAA = true;
 				}
 				else {
-					WriteChatf("%s\ayHarmonic Dissonance \arisn't ready right now\aw.", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\ayHarmonic Dissonance \arisn't ready right now\aw.");
 				}
 			}
 			else {
-				WriteChatf("%s\arI don't have the \ayHarmonic Dissonance \arAA\aw!", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arI don't have the \ayHarmonic Dissonance \arAA\aw!");
 			}
 			return;
 		}
@@ -398,7 +398,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			}
 
 			if (!canEvacAA && !canGroupEvacAA) {
-				WriteChatf("%s\arI don't seem to have the ability to evac!\aw", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arI don't seem to have the ability to \ayevac\ax!\aw");
 			}
 
 			return;
@@ -409,11 +409,11 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 					canTeleportAA = true;
 				}
 				else {
-					WriteChatf("%s\ayTeleport \arisn't ready right now\aw.", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "Teleport \arisn't ready right now\aw.");
 				}
 			}
 			else {
-				WriteChatf("%s\arI don't have the \ayTeleport \arAA\aw!", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arI don't have the \ayTeleport \arAA\aw!");
 			}
 			return;
 		}
@@ -422,8 +422,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			return;
 		}
 	}
-	WriteChatf("%s\arYou didn't provide a valid option for /relocate.\aw", PLUGINMSG);
-	WriteChatf("%s\arPlease do \"/relocate help\" for more information.\aw", PLUGINMSG);
+	WriteChatf(PLUGIN_MSG "\arYou didn't provide a valid option for /relocate.\aw");
+	WriteChatf(PLUGIN_MSG "\arPlease do \ao\"\ay/relocate help\ao\"\ax for more information.\aw");
 	return;
 }
 
@@ -435,8 +435,8 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 	GetArg(Arg, szLine, 1);
 
 	if (!_stricmp(Arg, "help")) {
-		WriteChatf("%s\agValid Translocate options are:\aw", PLUGINMSG);
-		WriteChatf("%s\ay/translocate\aw \arRedBot\aw to Translocate \arRedBot\aw to their bind.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agValid Translocate options are:\aw");
+		WriteChatf(PLUGIN_MSG "\ay/translocate \arRedBot\aw to Translocate \arRedBot\aw to their bind.");
 		return;
 	}
 
@@ -445,8 +445,8 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 		EQ_Spell* pSpell = GetSpellByName("Translocate");
 		if (!MyTarget()) {
 			if (strlen(Arg) == 0) {
-				WriteChatf("%s\arPlease provide a target for translocate\aw.", PLUGINMSG);
-				WriteChatf("%s\arYou can physically target a player, or provide a name like: \ag/translocate RedBot\aw.", PLUGINMSG);
+				WriteChatf(PLUGIN_MSG "\arPlease provide a target for \aytranslocate\aw.");
+				WriteChatf(PLUGIN_MSG "\arYou can physically target a player, or provide a name like: \ag/translocate RedBot\aw.");
 				return;
 			}
 			else {
@@ -457,27 +457,27 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 					haveAA = true;
 				if (!desiredTarget || !haveAA || !me) {
 					if (!desiredTarget)
-						WriteChatf("%s\arI can't find a player with the name \ay%s\aw", Arg);
+						WriteChatf(PLUGIN_MSG "\arI can't find a player with the name \ay%s\aw", Arg);
 					if (!haveAA)
-						WriteChatf("%s\arI don't have the AA Translocate");
+						WriteChatf(PLUGIN_MSG "\arI don't have the AA Translocate");
 					if (!me)
-						WriteChatf("%s\arI'm not in game, knock that off!");
+						WriteChatf(PLUGIN_MSG "\arI'm not in game, knock that off!");
 					return;
 				}
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("%s\arIt seems \ay%s\aw is out of range of \ay%s\aw.", PLUGINMSG, Arg, pSpell->Name);
+					WriteChatf(PLUGIN_MSG "\arIt seems \ay%s\aw is out of range of \ay%s\aw.", Arg, pSpell->Name);
 				}
 
 				pTarget = desiredTarget;
 
 				if (!MyTarget()) {
-					WriteChatf("%s\arWe do not have a target.", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arWe do not have a target.");
 				}
 				else if (MyTarget() && MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Type);
+					WriteChatf(PLUGIN_MSG "\ay%s\aw \aris not a Player!\aw", MyTarget()->Type);
 				}
 				else if (MyTargetID() == Me()->SpawnID) {
-					WriteChatf("%s\arYou can't translocate yourself, knock it off!", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arYou can't translocate yourself, knock it off!");
 				}
 				else {
 					canTranslocate = true;
@@ -489,17 +489,17 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 			if (strlen(Arg) == 0) {
 				PlayerClient* desiredTarget = GetSpawnByName(MyTarget()->Name);
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("%s\arIt seems \ay%s\aw \aris out of range of \ay%s\aw.", MyTarget()->Name, pSpell->Name, PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arIt seems \ay%s\aw \aris out of range of \ay%s\aw.", MyTarget()->Name, pSpell->Name);
 					return;
 				}
 
 				if (MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Name);
+					WriteChatf(PLUGIN_MSG "\ay%s\aw \aris not a Player!\aw", MyTarget()->Name);
 					return;
 				}
 
 				if (MyTargetID() == Me()->SpawnID) {
-					WriteChatf("%s\arYou can't translocate yourself, knock it off!\aw", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arYou can't translocate yourself, knock it off!\aw");
 					return;
 				}
 
@@ -509,34 +509,34 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 			else {
 				PlayerClient* desiredTarget = GetSpawnByName(Arg);
 				if (!desiredTarget) {
-					WriteChatf("%s\arI can't find a player with the name >>> \ay%s\ar <<<\aw.", PLUGINMSG, Arg);
+					WriteChatf(PLUGIN_MSG "\arI can't find a player with the name >>> \ay%s\ar <<<\aw.", Arg);
 					return;
 				}
 
 				if (desiredTarget && desiredTarget->Type != SPAWN_PLAYER) {
-					WriteChatf("%s\ay%s\aw \aris not a player.\aw", PLUGINMSG, desiredTarget);
+					WriteChatf(PLUGIN_MSG "\ay%s\aw \aris not a player.\aw", desiredTarget);
 					return;
 				}
 
 				if (desiredTarget->SpawnID == Me()->SpawnID) {
-					WriteChatf("%s\arYou can't translocate yourself, knock it off!\aw", PLUGINMSG);
+					WriteChatf(PLUGIN_MSG "\arYou can't translocate yourself, knock it off!\aw");
 					return;
 				}
 
 				if (desiredTarget && me && GetDistance3D(desiredTarget->X, desiredTarget->Y, desiredTarget->Z, me->X, me->Y, me->Z) > pSpell->Range) {
-					WriteChatf("%s\arIt seems \ay%s\ar is out of range of \ay%s\aw.", PLUGINMSG, Arg, pSpell->Name);
+					WriteChatf(PLUGIN_MSG "\arIt seems \ay%s\ar is out of range of \ay%s\aw.", Arg, pSpell->Name);
 					return;
 				}
 
 				pTarget = desiredTarget;
 
 				if (!MyTarget()) {
-					WriteChatf("We do not have a target.", PLUGINMSG);
+					WriteChatf("\arWe do not have a target.");
 					return;
 				}
 
 				if (MyTarget()->Type != SPAWN_PLAYER) {
-					WriteChatf("%s\ay%s\aw \aris not a Player!\aw", PLUGINMSG, MyTarget()->Name);
+					WriteChatf(PLUGIN_MSG "\ay%s\aw \aris not a Player!\aw", MyTarget()->Name);
 					return;
 				}
 
@@ -546,7 +546,7 @@ void TransloCmd(PlayerClient* pChar, char* szLine)
 		}
 
 	}
-	WriteChatf("%s\arYou are not a Wizard! No Translocate for you\aw!", PLUGINMSG);
+	WriteChatf(PLUGIN_MSG "\arYou are not a Wizard! No Translocate for you\aw!");
 }
 
 bool HaveAlias(const std::string& aliasName) {
@@ -560,12 +560,12 @@ bool HaveAlias(const std::string& aliasName) {
 PLUGIN_API void InitializePlugin()
 {
 	if (HaveAlias("/relocate")) { // Check our aliases
-		WriteChatf("%s\arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\arIt appears you already have an Alias for \ap/relocate\ar  please type \"\ay/alias /relocate delete\ar\" then reload this plugin.");
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 
 	if (HaveAlias("/translocate")) { // Check our aliases
-		WriteChatf("%s\arIt appears you already have an Alias for \ap/translocate\ar  please type \"\ay/alias /translocate delete\ar\" then reload this plugin.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\arIt appears you already have an Alias for \ap/translocate\ar  please type \"\ay/alias /translocate delete\ar\" then reload this plugin.");
 		EzCommand("/timed 10 /plugin MQ2Relocate Unload");
 	}
 	else {
@@ -603,7 +603,7 @@ PLUGIN_API void OnPulse()
 	if (bAmConverting) {
 		if (!FindItemByName(convertoption) && FindItemByName(reloClicky)) {
 			sprintf_s(temp, "/convertitem %s", convertoption);
-			WriteChatf("%sConverting Item", PLUGINMSG); // Debug purposes
+			WriteChatf(PLUGIN_MSG "Converting Item"); // Debug purposes
 			EzCommand(temp);
 		}
 		else {
@@ -617,13 +617,13 @@ PLUGIN_API void OnPulse()
 		// This is where I trigger the usage of the converted item.
 		sprintf_s(temp, "/useitem \"%s\"", convertoption);
 		EzCommand(temp);
-		WriteChatf("%sRelocating with: \ag%s\aw", PLUGINMSG, convertoption);
+		WriteChatf(PLUGIN_MSG "\agRelocating with: \ag%s\aw", convertoption);
 		needsUsing = false; // Turn off needsusing, because i've used it.
 		sprintf_s(convertoption, ""); // Clear the convertitem string so that it's blank and ready for modification again.
 	}
 
 	if (canGateAA) {
-		WriteChatf("%sRelocating with: \ayGate AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agRelocating with: \ayGate AA\aw.");
 		EzCommand("/alt act 1217");
 		canGateAA = false;
 	}
@@ -638,63 +638,63 @@ PLUGIN_API void OnPulse()
 	}
 
 	if (canOriginAA) {
-		WriteChatf("%sRelocating with: \ayOrigin AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agRelocating with: \ayOrigin AA\aw.");
 		EzCommand("/alt act 331");
 		canOriginAA = false;
 	}
 
 	if (canLobbyAA) {
-		WriteChatf("%sRelocating to \agGuild Lobby\aw with: \ayThrone of Heroes AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agRelocating to \agGuild Lobby\aw with: \ayThrone of Heroes AA\aw.");
 		EzCommand("/alt act 511");
 		canLobbyAA = false;
 	}
 
 	if (canHarmonicAA) {
-		WriteChatf("%sRelocating to \agTheater of Blood\aw with: \ayHarmonic Dissonance AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agRelocating to \agTheater of Blood\aw with: \ayHarmonic Dissonance AA\aw.");
 		EzCommand("/alt act 574");
 		canHarmonicAA = false;
 	}
 
 	if (canEvacAA) { // Check each evac AA
 		if (AltAbilityReady("Steathly Getaway")) {
-			WriteChatf("%sSelf Evac with: \ayStealthy Getaway AA\aw.", PLUGINMSG);
+			WriteChatf(PLUGIN_MSG "\agSelf Evac with: \ayStealthy Getaway AA\aw.");
 			EzCommand("/alt act 789");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Abscond")) {
-			WriteChatf("%sSelf Evac with: \ayAbscond AA\aw.", PLUGINMSG);
+			WriteChatf(PLUGIN_MSG "\agSelf Evac with: \ayAbscond AA\aw.");
 			EzCommand("/alt act 490");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Egress")) {
-			WriteChatf("Self Evac with: \ayEgress AA\aw.");
+			WriteChatf("\agSelf Evac with: \ayEgress AA\aw.");
 			EzCommand("/alt act 8602");
 			canEvacAA = false;
 		}
 
 		if (AltAbilityReady("Levant")) {
-			WriteChatf("%sSelf Evac with: \ayLevant AA\aw.", PLUGINMSG);
+			WriteChatf(PLUGIN_MSG "\agSelf Evac with: \ayLevant AA\aw.");
 			EzCommand("/alt act 2899");
 			canEvacAA = false;
 		}
 	}
 
 	if (canGroupEvacAA) { // Check each evac AA
-		WriteChatf("%sGroup Evac with: \ayExodus AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agGroup Evac with: \ayExodus AA\aw.");
 		EzCommand("/alt act 43");
 		canGroupEvacAA = false;
 	}
 
 	if (canTranslocate) {
-		WriteChatf("%sTranslocating \ay%s\aw with: \ayTranslocate AA\aw.", PLUGINMSG, pTarget->Name);
+		WriteChatf(PLUGIN_MSG "\agTranslocating \ay%s\aw with: \ayTranslocate AA\aw.", pTarget->Name);
 		EzCommand("/alt act 9703");
 		canTranslocate = false;
 	}
 
 	if (canTeleportAA) {
-		WriteChatf("%sTeleporting surrounding allies with: \ayTeleport AA\aw.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "\agTeleporting surrounding allies with: \ayTeleport AA\aw.");
 		EzCommand("/alt act 9704");
 		canTeleportAA = false;
 	}
@@ -760,11 +760,11 @@ void StatusItemCheck(const char* szItemName)
 			return;
 		}
 		else {
-			WriteChatf("%s\ay%s \aris not ready\aw!", PLUGINMSG, szItemName);
+			WriteChatf(PLUGIN_MSG "%s \aris not ready\aw!", szItemName);
 			return;
 		}
 	}
-	WriteChatf("%s\arYou do not have a \ay%s\aw!", PLUGINMSG, szItemName);
+	WriteChatf(PLUGIN_MSG "\arYou do not have a \ay%s\aw!", szItemName);
 	return;
 }
 
@@ -798,7 +798,7 @@ void BardStopSinging() {
 		if (IsPluginLoaded("mq2twist")) {
 			EzCommand("/twist off");
 		}
-		WriteChatf("%s\agWe are going to /stopsong and /twist off, to use our relocate items.", PLUGINMSG);
+		WriteChatf(PLUGIN_MSG "We are going to /stopsong and /twist off, to use our relocate items.");
 	}
 }
 
@@ -927,7 +927,7 @@ void UseItem(const char* pItem)
 	char temp2[MAX_STRING] = "\"";
 	strcat_s(temp, MAX_STRING, temp2);
 	EzCommand(temp);
-	WriteChatf("%sUsing Item: \ay%s", PLUGINMSG, pItem);
+	WriteChatf(PLUGIN_MSG "Using Item: \ay%s", pItem);
 	GlobalLastTimeUsed = GetTickCount64() + GlobalSkillDelay;
 }
 
