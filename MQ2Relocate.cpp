@@ -707,6 +707,7 @@ bool UseClickyByItemName(const char* pItem)
 			if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
 				if (ItemReady(item->GetName())) {
 					UseItem(item->GetName());
+					return true;
 				}
 			}
 		}
