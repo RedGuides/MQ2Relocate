@@ -919,15 +919,7 @@ bool DiscReady(EQ_Spell* pSpell)
 {
 	if (!InGame()) return false;
 	time_t timeNow = time(NULL);
-#if !defined(ROF2EMU) && !defined(UFEMU)
 	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex, pSpell->SpellGroup) < timeNow) {
-#else
-	if (pSpell->ReuseTimerIndex == -1 || pSpell->ReuseTimerIndex > 20) //this matters on emu it will actually crash u if above 20
-	{
-		return true;
-	}
-	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex) < timeNow) {
-#endif
 		return true;
 	}
 	return false;
