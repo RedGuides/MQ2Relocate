@@ -40,7 +40,7 @@ char convertoption[MAX_STRING] = { 0 };
 char reloClicky[128] = { 0 };
 bool bAmConverting = false;
 bool needsUsing = false;
-bool canGatePotion = false;
+bool canGateClicky = false;
 bool canGateAA = false;
 bool canOriginAA = false;
 bool canLobbyAA = false;
@@ -85,6 +85,9 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			WriteChatf(PLUGIN_MSG "/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agumbral\aw to use your \ayUmbral Plains Mushroom\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \ashadow haven\aw to use your \ayLost Turnip Sign\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \askyshrine\aw to use your \aySkyshrine Crystal\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.");
 			WriteChatf(PLUGIN_MSG "Valid \aoTranslocate\ax options are:\aw");
@@ -250,13 +253,17 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 				return;
 			}
 			if (!canGateAA) {
-				// Check if i have a Philter of Major Translocation - if so, turn canGatePotion to true
-				if (FindItemByName("Philter of Major Translocation")) {
-					canGatePotion = true;
+				// Bulwark of Many portals is a mage summoned item, it has charges, but easy to come by
+				if (FindItemByName("Bulwark of Many Portals")) {
+					canGateClicky = true;
+				}		
+				// Check if i have a Philter of Major Translocation
+				else if (FindItemByName("Philter of Major Translocation")) {
+					canGateClicky = true;
 				}
 				// "Gate Potion" is a progression server version
 				else if (FindItemByName("Gate Potion"), true) {
-					canGatePotion = true;
+					canGateClicky = true;
 				}
 				else {
 					WriteChatf(PLUGIN_MSG "\arI don't seem to have the ability to \aygate\ax, nor do you have a \aygate potion\ax!\aw");
@@ -306,8 +313,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			// Not doing a "Find Item" because IsClickyReady function already does that
 			// We are also verifying that we don't have the "anchor" in our inventory by ID 52585 for Secondary Anchor
 			else if (IsClickyReadyByItemName("Secondary Anchor Transport Device") && !FindItemCountByID(52585)) {
-					sprintf_s(reloClicky, "Secondary Anchor Transport Device");
-					UseClickyByItemName(reloClicky);
+				sprintf_s(reloClicky, "Secondary Anchor Transport Device");
+				UseClickyByItemName(reloClicky);
 			}
 			else {
 				WriteChatf(PLUGIN_MSG "\arDOH!\aw I don't have an \ayanchor\ax clicky that is ready");
@@ -373,7 +380,6 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			return;
 		}
 		if (!_stricmp(Arg, "evac")) { // use evac AA if you have it
-
 			if (GroupSize() > 1 && AltAbility("Exodus") && AltAbility("Exodus")->CurrentRank > 0 && AltAbilityReady("Exodus")) { // Exodus GROUP evac 43
 				canGroupEvacAA = true;
 			}
@@ -419,6 +425,18 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 		}
 		if (!_stricmp(Arg, "crystal")) { // Froststone Crystal Resonator ToV pre-order item
 			StatusItemCheck("Froststone Crystal Resonator");
+			return;
+		}
+		if (!_stricmp(Arg, "umbral")) { // Umbral Plains Mushroom ToL self clicky
+			StatusItemCheck("Umbral Plains Mushroom");
+			return;
+		}
+		if (!_stricmp(Arg, "shadow haven")) { // Lost Turnip Sign NoS self clicky
+			StatusItemCheck("Lost Turnip Sign");
+			return;
+		}
+		if (!_stricmp(Arg, "skyshrine")) { // Lost Turnip Sign CoV self clicky
+			StatusItemCheck("Skyshrine Crystal");
 			return;
 		}
 	}
@@ -591,7 +609,7 @@ PLUGIN_API void OnPulse()
 	}
 
 	//DON'T FORGET TO CHANGE THE FREAKING BASE CASES SO THAT YOU ACTUALLY CONTINUE INTO THE FUNCTION! (WTB back many minutes of my life)
-	if (!strlen(convertoption) && !bAmConverting && !needsUsing && !canGatePotion && !canGateAA && !canOriginAA && !canLobbyAA && !canHarmonicAA && !canEvacAA && !canGroupEvacAA && !canTranslocate && !canTeleportAA) {
+	if (!strlen(convertoption) && !bAmConverting && !needsUsing && !canGateClicky && !canGateAA && !canOriginAA && !canLobbyAA && !canHarmonicAA && !canEvacAA && !canGroupEvacAA && !canTranslocate && !canTeleportAA) {
 		return;
 	}
 
@@ -628,12 +646,12 @@ PLUGIN_API void OnPulse()
 		canGateAA = false;
 	}
 
-	if (canGatePotion) {
+	if (canGateClicky) {
 		if (UseClickyByItemName("Philter of Major Translocation")) {
-			canGatePotion = false;
+			canGateClicky = false;
 		}
 		else if (UseClickyByItemName("Gate Potion")) {
-			canGatePotion = false;
+			canGateClicky = false;
 		}
 	}
 
