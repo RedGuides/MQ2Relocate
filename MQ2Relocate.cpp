@@ -86,8 +86,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			WriteChatf(PLUGIN_MSG "/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agumbral\aw to use your \ayUmbral Plains Mushroom\aw.");
-			WriteChatf(PLUGIN_MSG "/relocate \ashadow haven\aw to use your \ayLost Turnip Sign\aw.");
-			WriteChatf(PLUGIN_MSG "/relocate \askyshrine\aw to use your \aySkyshrine Crystal\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agshadow haven\aw to use your \ayLost Turnip Sign\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agskyshrine\aw to use your \aySkyshrine Crystal\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agevac\aw to use your \ay Group Evac AA\aw (if you are in a group) or your \ay Personal Evac AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agteleport\aw to use your \ay AoE Teleport AA\aw.");
 			WriteChatf(PLUGIN_MSG "Valid \aoTranslocate\ax options are:\aw");
