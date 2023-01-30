@@ -63,7 +63,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 		return;
 	//Get our parameters
 	char Arg[MAX_STRING] = { 0 };
-	GetArg(Arg, szLine, 1);
+	GetMaybeQuotedArg(Arg, MAX_STRING, szLine, 1);
 	if (strlen(Arg)) {
 		char temp[MAX_STRING] = "/useitem ";
 
