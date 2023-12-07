@@ -85,6 +85,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 			WriteChatf(PLUGIN_MSG "/relocate \aglobby\aw to use your \ay Throne of Heroes AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \aglaurion\aw to use your \ayLaurion Inn Lute\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agumbral\aw to use your \ayUmbral Plains Mushroom\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agshadow haven\aw to use your \ayLost Turnip Sign\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agskyshrine\aw to use your \aySkyshrine Crystal\aw.");
@@ -425,6 +426,10 @@ void ReloCmd(PlayerClient* pChar, char* szLine)
 		}
 		if (!_stricmp(Arg, "crystal")) { // Froststone Crystal Resonator ToV pre-order item
 			StatusItemCheck("Froststone Crystal Resonator");
+			return;
+		}
+		if (!_stricmp(Arg, "laurion")) { // Laurion Inn LS self clicky
+			StatusItemCheck("Laurion Inn Lute");
 			return;
 		}
 		if (!_stricmp(Arg, "umbral")) { // Umbral Plains Mushroom ToL self clicky
