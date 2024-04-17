@@ -155,6 +155,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			const char greatdivide[64] = "Zueria Slide: Great Divide";
 			const char nek[64] = "Zueria Slide: Nektulos";
 			const char nro[64] = "Zueria Slide: North Ro";
+			const char nro2[64] = "Northern Desert Outlook Device";
 			const char skyfire[64] = "Zueria Slide: Skyfire";
 
 			if (!FindItemByName(reloClicky)) {
