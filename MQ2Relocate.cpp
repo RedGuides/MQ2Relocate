@@ -62,13 +62,14 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 		return;
 	}
 
+	}
 	//Get our parameters
 	char Arg[MAX_STRING] = { 0 };
 	GetMaybeQuotedArg(Arg, MAX_STRING, szLine, 1);
 	if (strlen(Arg)) {
 		char temp[MAX_STRING] = "/useitem ";
 
-		if (!_stricmp(Arg, "help")) { // Output available arguments for /relocate
+		if (ci_equals(Arg, "help")) { // Output available arguments for /relocate
 			WriteChatf(PLUGIN_MSG "Welcome to MQ2Relocate!");
 			WriteChatf(PLUGIN_MSG "By \agSic\aw & \aoChatWithThisName\aw Exclusively for \arRedGuides\aw.");
 			WriteChatf(PLUGIN_MSG "Valid \aoRelocate\ax options are:\aw");
@@ -98,16 +99,18 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "air") || !_stricmp(Arg, "fire") || !_stricmp(Arg, "stone")) { // Use Wishing Lamp:
-			char reloClicky[64] = "Wishing Lamp:";
-			char air[64] = "Wishing Lamp: Zephyr's Flight";
-			char fire[64] = "Wishing Lamp: Palace of Embers";
-			char stone[64] = "Wishing Lamp: The Stone Demesne";
+		if (ci_equals(Arg, "air") || ci_equals(Arg, "fire") || ci_equals(Arg, "stone")) { // Use Wishing Lamp:
+			const char reloClicky[64] = "Wishing Lamp:";
+			const char air[64] = "Wishing Lamp: Zephyr's Flight";
+			const char fire[64] = "Wishing Lamp: Palace of Embers";
+			const char stone[64] = "Wishing Lamp: The Stone Demesne";
+
 			if (!FindItemByName(reloClicky)) {
 				WriteChatf(PLUGIN_MSG "\arYou do not appear to have a \ayWishing Lamp.");
 				return;
 			}
-			else if (!_stricmp(Arg, "air")) {
+
+			if (ci_equals(Arg, "air")) {
 				if (FindItemByName(air)) {
 					strcat_s(temp, air);
 					EzCommand(temp);
@@ -118,7 +121,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, air);
 				}
 			}
-			else if (!_stricmp(Arg, "fire")) {
+
+			if (ci_equals(Arg, "fire")) {
 				if (FindItemByName(fire)) {
 					strcat_s(temp, fire);
 					EzCommand(temp);
@@ -129,7 +133,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, fire);
 				}
 			}
-			else if (!_stricmp(Arg, "stone")) {
+
+			if (ci_equals(Arg, "stone")) {
 				if (FindItemByName(stone)) {
 					strcat_s(temp, stone);
 					EzCommand(temp);
@@ -143,15 +148,13 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		// this handles Zueria slide & Northern Desert Outlook Device
-		if (!_stricmp(Arg, "stonebrunt") || !_stricmp(Arg, "dreadlands") || !_stricmp(Arg, "nek") || !_stricmp(Arg, "greatdivide") || !_stricmp(Arg, "nro") || !_stricmp(Arg, "skyfire")) { // Zueria Slide
-			char reloClicky[64] = "Zueria Slide:";
+		if (ci_equals(Arg, "stonebrunt") || ci_equals(Arg, "dreadlands") || ci_equals(Arg, "nek") || ci_equals(Arg, "greatdivide") || ci_equals(Arg, "nro") || ci_equals(Arg, "skyfire")) { // Zueria Slide
+			const char reloClicky[64] = "Zueria Slide:";
 			const char stonebrunt[64] = "Zueria Slide: Stonebrunt";
 			const char dreadlands[64] = "Zueria Slide: Dreadlands";
 			const char greatdivide[64] = "Zueria Slide: Great Divide";
 			const char nek[64] = "Zueria Slide: Nektulos";
 			const char nro[64] = "Zueria Slide: North Ro";
-			const char nro2[64] = "Northern Desert Outlook Device";
 			const char skyfire[64] = "Zueria Slide: Skyfire";
 
 			if (!FindItemByName(reloClicky)) {
@@ -159,7 +162,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 				return;
 			}
 
-			if (!_stricmp(Arg, "stonebrunt")) {
+			if (ci_equals(Arg, "stonebrunt")) {
 				if (FindItemByName(stonebrunt)) {
 					strcat_s(temp, stonebrunt);
 					EzCommand(temp);
@@ -170,7 +173,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, stonebrunt);
 				}
 			}
-			else if (!_stricmp(Arg, "dreadlands")) {
+
+			if (ci_equals(Arg, "dreadlands")) {
 				if (FindItemByName(dreadlands)) {
 					strcat_s(temp, dreadlands);
 					EzCommand(temp);
@@ -181,7 +185,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, dreadlands);
 				}
 			}
-			else if (!_stricmp(Arg, "greatdivide")) {
+
+			if (ci_equals(Arg, "greatdivide")) {
 				if (FindItemByName(greatdivide)) {
 					strcat_s(temp, greatdivide);
 					EzCommand(temp);
@@ -192,7 +197,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, greatdivide);
 				}
 			}
-			else if (!_stricmp(Arg, "nek")) {
+
+			if (ci_equals(Arg, "nek")) {
 				if (FindItemByName(nek)) {
 					strcat_s(temp, nek);
 					EzCommand(temp);
@@ -203,14 +209,9 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, nek);
 				}
 			}
-			// both zueria slide & northern desert outlook device
-			else if (!_stricmp(Arg, "nro")) {
-				if (FindItemByName(nro2)) {
-					strcat_s(temp, nro2);
-					EzCommand(temp);
-					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nro);
-				}
-				else if (FindItemByName(nro)) {
+
+			if (ci_equals(Arg, "nro")) {
+				if (FindItemByName(nro)) {
 					strcat_s(temp, nro);
 					EzCommand(temp);
 					WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nro);
@@ -220,7 +221,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, nro);
 				}
 			}
-			else if (!_stricmp(Arg, "skyfire")) {
+
+			if (ci_equals(Arg, "skyfire")) {
 				if (FindItemByName(skyfire)) {
 					strcat_s(temp, skyfire);
 					EzCommand(temp);
@@ -234,7 +236,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "pok")) { // Plane of Knowledge
+		if (ci_equals(Arg, "pok")) { // Plane of Knowledge
 			if (FindItemByName("Drunkard's Stein") && IsClickyReadyByItemName("Drunkard's Stein")) {
 				sprintf_s(reloClicky, "Drunkard's Stein");
 			}
@@ -264,7 +266,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "gate")) { // Use gate AA if you have it, otherwise try and use a gate potion
+		if (ci_equals(Arg, "gate")) { // Use gate AA if you have it, otherwise try and use a gate potion
 			if (AltAbility("Gate") && AltAbility("Gate")->CurrentRank > 0) {
 				canGateAA = true;
 				return;
@@ -290,7 +292,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "origin")) { // Try and use Origin AA, otherwise try and use Sceptre of Draconic Calling
+		if (ci_equals(Arg, "origin")) { // Try and use Origin AA, otherwise try and use Sceptre of Draconic Calling
 			if (AltAbility("Origin") && AltAbility("Origin")->CurrentRank > 0){
 				if (AltAbilityReady("Origin")) {
 					canOriginAA = true;
@@ -298,6 +300,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 				else {
 					WriteChatf(PLUGIN_MSG "Origin \arisn't ready right now\aw.");
 				}
+
 				if ((pLocalPC->StartingCity == 394) && FindItemByName("Sceptre of Draconic Calling")) {
 					if (IsClickyReadyByItemName("Sceptre of Draconic Calling")) {
 						UseClickyByItemName("Sceptre of Draconic Calling");
@@ -313,17 +316,17 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "brell")) { // Mark of Brell for Brell's Rest
+		if (ci_equals(Arg, "brell")) { // Mark of Brell for Brell's Rest
 			StatusItemCheck("Mark of Brell");
 			return;
 		}
 
-		if (!_stricmp(Arg, "bronze")) { // Harbinger's Staff for City of Bronze
+		if (ci_equals(Arg, "bronze")) { // Harbinger's Staff for City of Bronze
 			StatusItemCheck("Harbinger's Staff");
 			return;
 		}
 
-		if (!_stricmp(Arg, "anchor")) { // Use Primary or Secondary Anchor
+		if (ci_equals(Arg, "anchor")) { // Use Primary or Secondary Anchor
 			// Not doing a "Find Item" because IsClickyReady function already does that
 			// We are also verifying that we don't have the "anchor" in our inventory by ID 52584 for Primary Anchor
 			if (IsClickyReadyByItemName("Primary Anchor Transport Device") && !FindItemCountByID(52584)) {
@@ -342,17 +345,17 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "anchor1")) { // Use specifically Primary Anchor
+		if (ci_equals(Arg, "anchor1")) { // Use specifically Primary Anchor
 			StatusItemCheck("Primary Anchor Transport Device");
 			return;
 		}
 
-		if (!_stricmp(Arg, "anchor2")) { // Use specifically Secondary Anchor
+		if (ci_equals(Arg, "anchor2")) { // Use specifically Secondary Anchor
 			StatusItemCheck("Secondary Anchor Transport Device");
 			return;
 		}
 
-		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) { // Use fellowship Insignia
+		if (ci_equals(Arg, "fellow") || ci_equals(Arg, "fellowship")) { // Use fellowship Insignia
 			if (FindItemByName("Fellowship Registration Insignia")) {
 				if (IsClickyReadyByItemName("Fellowship Registration Insignia")) {
 					if (pChar->HideMode) { // Fellowship insignia requires being visible to use
@@ -362,7 +365,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 						UseClickyByItemName("Fellowship Registration Insignia");
 					}
 					else {
-							WriteChatf(PLUGIN_MSG "\arYou do not have a campfire up\aw.");
+						WriteChatf(PLUGIN_MSG "\arYou do not have a campfire up\aw.");
 					}
 				}
 				else {
@@ -375,7 +378,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "lobby")) {
+		if (ci_equals(Arg, "lobby")) {
 			if (AltAbility("Throne of Heroes") && AltAbility("Throne of Heroes")->CurrentRank > 0) {
 				if (AltAbilityReady("Throne of Heroes")) {
 					canLobbyAA = true;
@@ -390,7 +393,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "blood")) {
+		if (ci_equals(Arg, "blood")) {
 			if (AltAbility("Harmonic Dissonance") && AltAbility("Harmonic Dissonance")->CurrentRank > 0) {
 				if (AltAbilityReady("Harmonic Dissonance")) {
 					canHarmonicAA = true;
@@ -405,7 +408,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "evac")) { // use evac AA if you have it
+		if (ci_equals(Arg, "evac")) { // use evac AA if you have it
 			if (GroupSize() > 1 && AltAbility("Exodus") && AltAbility("Exodus")->CurrentRank > 0 && AltAbilityReady("Exodus")) { // Exodus GROUP evac 43
 				canGroupEvacAA = true;
 			}
@@ -436,7 +439,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "teleport")) {
+		if (ci_equals(Arg, "teleport")) {
 			if (AltAbility("Teleport") && AltAbility("Teleport")->CurrentRank > 0) {
 				if (AltAbilityReady("Teleport")) {
 					canTeleportAA = true;
@@ -451,7 +454,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			return;
 		}
 
-		if (!_stricmp(Arg, "crystal")) { // Froststone Crystal Resonator ToV pre-order item
+		if (ci_equals(Arg, "crystal")) { // Froststone Crystal Resonator ToV pre-order item
 			StatusItemCheck("Froststone Crystal Resonator");
 			return;
 		}
@@ -485,11 +488,10 @@ void TransloCmd(PlayerClient* pChar, char* szLine) {
 	if (!InGame()) {
 		return;
 	}
-
 	char Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
 
-	if (!_stricmp(Arg, "help")) {
+	if (ci_equals(Arg, "help")) {
 		WriteChatf(PLUGIN_MSG "\agValid Translocate options are:\aw");
 		WriteChatf(PLUGIN_MSG "\ay/translocate \arRedBot\aw to Translocate \arRedBot\aw to their bind.");
 		return;
@@ -516,14 +518,12 @@ void TransloCmd(PlayerClient* pChar, char* szLine) {
 					if (!desiredTarget) {
 						WriteChatf(PLUGIN_MSG "\arI can't find a player with the name \ay%s\aw", Arg);
 					}
-
 					if (!haveAA) {
 						WriteChatf(PLUGIN_MSG "\arI don't have the AA Translocate");
 					}
-
 					if (!me) {
 						WriteChatf(PLUGIN_MSG "\arI'm not in game, knock that off!");
-					}
+					} 
 					return;
 				}
 
@@ -646,7 +646,6 @@ PLUGIN_API void OnPulse() {
 	if (++iPulse < iPulseDelay) {
 		return;
 	}
-
 	iPulse = 0;
 
 	//Base Cases
@@ -766,13 +765,11 @@ PLUGIN_API void OnPulse() {
 }
 
 bool UseClickyByItemName(const char* pItem) {
-	if (FindItemCountByName(pItem)) {
-		if (ItemClient* item = FindItemByName(pItem)) {
-			if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
-				if (ItemReady(item->GetName())) {
-					UseItem(item->GetName());
-					return true;
-				}
+	if (ItemClient* item = FindItemByName(pItem)) {
+		if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
+			if (ItemReady(item->GetName())) {
+				UseItem(item->GetName());
+				return true;
 			}
 		}
 	}
@@ -780,12 +777,10 @@ bool UseClickyByItemName(const char* pItem) {
 }
 
 bool IsClickyReadyByItemName(const char* pItem) {
-	if (FindItemCountByName(pItem)) {
-		if (ItemClient* item = FindItemByName(pItem)) {
-			if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
-				if (ItemReady(item->GetName())) {
-					return true;
-				}
+	if (ItemClient* item = FindItemByName(pItem)) {
+		if (EQ_Spell* itemSpell = GetSpellByID(item->GetSpellID(ItemSpellType_Clicky))) {
+			if (ItemReady(item->GetName())) {
+				return true;
 			}
 		}
 	}
@@ -812,8 +807,7 @@ PLUGIN_API void SetGameState(unsigned long GameState) {
 	}
 }
 
-void StatusItemCheck(const char* szItemName)
-{
+void StatusItemCheck(const char* szItemName) {
 	if (FindItemByName(szItemName)) {
 		if (IsClickyReadyByItemName(szItemName)) {
 			UseClickyByItemName(szItemName);
@@ -825,18 +819,17 @@ void StatusItemCheck(const char* szItemName)
 		}
 	}
 	WriteChatf(PLUGIN_MSG "\arYou do not have a \ay%s\aw!", szItemName);
-	return;
 }
 
 inline bool InGame() {
-	return(GetGameState() == GAMESTATE_INGAME && pLocalPC && pLocalPlayer && GetPcProfile());
+	return (GetGameState() == GAMESTATE_INGAME && pLocalPC && pLocalPlayer && GetPcProfile());
 }
 
 CAltAbilityData* AltAbility(const char* szAltName) {
 	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
 		if (CAltAbilityData* pAbility = GetAAById(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
-				if (!_stricmp(szAltName, pName)) {
+				if (ci_equals(szAltName, pName)) {
 					return pAbility;
 				}
 			}
@@ -857,8 +850,7 @@ void BardStopSinging() {
 }
 
 bool CastingCheck() {
-	PlayerClient* me = pLocalPlayer;
-	if (me->GetClass() == Bard) {
+	if (pLocalPlayer->GetClass() == Bard) {
 		BardStopSinging();
 	}
 	else if (Casting()) {
@@ -868,31 +860,24 @@ bool CastingCheck() {
 }
 
 bool AltAbilityReady(const char* szLine, const unsigned long TargetID) {
-	if (!InGame() || IsSpellBookOpen() || IAmDead()) {
+	if (!InGame() || !pLocalPlayer || GlobalLastTimeUsed >= GetTickCount64() || IsSpellBookOpen() || IAmDead()) {
 		return false;
 	}
-
-	PlayerClient* me = pLocalPlayer;
 
 	if (CastingCheck()) {
-		return false;
-	}
-
-	if (!me || GlobalLastTimeUsed >= GetTickCount64() || Invis(me)) {
 		return false;
 	}
 
 	for (auto nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
 		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
-				if (!_stricmp(szLine, pName)) {
+				if (ci_equals(szLine, pName)) {
 					if (pAbility->SpellID != -1) {
 						if (EQ_Spell* myAltAbility = GetSpellByID(pAbility->SpellID)) {
 							//Am I in motion?
 							if (myAltAbility->CastTime && Moving(Me())) {
 								return false;
 							}
-
 							if (DiscReady(myAltAbility)) {
 								return pAltAdvManager->IsAbilityReady(pPCData, pAbility, 0);
 							}
@@ -940,8 +925,14 @@ bool Moving(PlayerClient* pSpawn) {
 }
 
 bool ItemReady(const char* szItem) {
-	if (GlobalLastTimeUsed >= GetTickCount64()) return false;
-	if (pLocalPC->GetClass() != Bard && Casting()) return false;
+	if (GlobalLastTimeUsed >= GetTickCount64()) {
+		return false;
+	}
+
+	if (pLocalPC->GetClass() != Bard && Casting()) {
+		return false;
+	}
+
 	if (ItemClient* item = FindItemByName(szItem, true)) {
 		if (item->GetSpellRecastTime(ItemSpellType_Clicky) != -1) {
 			uint32_t timer = GetItemTimer(item);
