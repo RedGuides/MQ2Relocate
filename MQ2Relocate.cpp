@@ -120,8 +120,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, air);
 				}
 			}
-
-			if (ci_equals(Arg, "fire")) {
+			else if (ci_equals(Arg, "fire")) {
 				if (FindItemByName(fire)) {
 					strcat_s(temp, fire);
 					EzCommand(temp);
@@ -132,8 +131,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, fire);
 				}
 			}
-
-			if (ci_equals(Arg, "stone")) {
+			else if (ci_equals(Arg, "stone")) {
 				if (FindItemByName(stone)) {
 					strcat_s(temp, stone);
 					EzCommand(temp);
@@ -173,8 +171,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, stonebrunt);
 				}
 			}
-
-			if (ci_equals(Arg, "dreadlands")) {
+			else if (ci_equals(Arg, "dreadlands")) {
 				if (FindItemByName(dreadlands)) {
 					strcat_s(temp, dreadlands);
 					EzCommand(temp);
@@ -185,8 +182,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, dreadlands);
 				}
 			}
-
-			if (ci_equals(Arg, "greatdivide")) {
+			else if (ci_equals(Arg, "greatdivide")) {
 				if (FindItemByName(greatdivide)) {
 					strcat_s(temp, greatdivide);
 					EzCommand(temp);
@@ -197,8 +193,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, greatdivide);
 				}
 			}
-
-			if (ci_equals(Arg, "nek")) {
+			else if (ci_equals(Arg, "nek")) {
 				if (FindItemByName(nek)) {
 					strcat_s(temp, nek);
 					EzCommand(temp);
@@ -209,8 +204,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, nek);
 				}
 			}
-
-			if (ci_equals(Arg, "nro")) {
+			else if (ci_equals(Arg, "nro")) {
 				if (FindItemByName(nro)) {
 					strcat_s(temp, nro);
 					EzCommand(temp);
@@ -221,8 +215,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 					sprintf_s(convertoption, MAX_STRING, nro);
 				}
 			}
-
-			if (ci_equals(Arg, "skyfire")) {
+			else if (ci_equals(Arg, "skyfire")) {
 				if (FindItemByName(skyfire)) {
 					strcat_s(temp, skyfire);
 					EzCommand(temp);
@@ -514,16 +507,16 @@ void TransloCmd(PlayerClient* pChar, char* szLine) {
 					haveAA = true;
 				}
 
-				if (!desiredTarget || !haveAA || !me) {
-					if (!desiredTarget) {
-						WriteChatf(PLUGIN_MSG "\arI can't find a player with the name \ay%s\aw", Arg);
-					}
-					if (!haveAA) {
-						WriteChatf(PLUGIN_MSG "\arI don't have the AA Translocate");
-					}
-					if (!me) {
-						WriteChatf(PLUGIN_MSG "\arI'm not in game, knock that off!");
-					} 
+				if (!desiredTarget) {
+					WriteChatf(PLUGIN_MSG "\arI can't find a player with the name \ay%s\aw", Arg);
+					return;
+				}
+				if (!haveAA) {
+					WriteChatf(PLUGIN_MSG "\arI don't have the AA Translocate");
+					return;
+				}
+				if (!me) {
+					WriteChatf(PLUGIN_MSG "\arI'm not in game, knock that off!");
 					return;
 				}
 
