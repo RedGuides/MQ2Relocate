@@ -87,6 +87,7 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			WriteChatf(PLUGIN_MSG "/relocate \agblood\aw to use your \ay Theatre of Blood AA\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agcrystal\aw to use your \ayFroststone Crystal Resonator\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \aglaurion\aw to use your \ayLaurion Inn Lute\aw.");
+			WriteChatf(PLUGIN_MSG "/relocate \agnro2\aw to use your \ayNorthern Desert Outlook Device\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agumbral\aw to use your \ayUmbral Plains Mushroom\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agshadow haven\aw to use your \ayLost Turnip Sign\aw.");
 			WriteChatf(PLUGIN_MSG "/relocate \agskyshrine\aw to use your \aySkyshrine Crystal\aw.");
@@ -152,7 +153,6 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 			const char greatdivide[64] = "Zueria Slide: Great Divide";
 			const char nek[64] = "Zueria Slide: Nektulos";
 			const char nro[64] = "Zueria Slide: North Ro";
-			const char nro2[64] = "Northern Desert Outlook Device";
 			const char skyfire[64] = "Zueria Slide: Skyfire";
 
 			if (!FindItemByName(reloClicky)) {
@@ -227,6 +227,19 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 				}
 			}
 			return;
+		}
+
+		if (ci_equals(Arg, "nro2")) {
+			const char nro2[64] = "Northern Desert Outlook Device";
+			if (FindItemByName(nro2)) {
+				strcat_s(temp, nro2);
+				EzCommand(temp);
+				WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nro2);
+			}
+			else {
+				WriteChatf(PLUGIN_MSG "\arYou do not appear to have a Northern Desert Outlook Device.");
+				return;
+			}
 		}
 
 		if (ci_equals(Arg, "pok")) { // Plane of Knowledge
