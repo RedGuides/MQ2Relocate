@@ -231,10 +231,8 @@ void ReloCmd(PlayerClient* pChar, char* szLine) {
 
 		if (ci_equals(Arg, "nro2")) {
 			const char nro2[64] = "Northern Desert Outlook Device";
-			if (FindItemByName(nro2)) {
-				strcat_s(temp, nro2);
-				EzCommand(temp);
-				WriteChatf(PLUGIN_MSG "\agRelocating with: \ay%s ", nro2);
+			if (FindItemByName(nro2) && IsClickyReadyByItemName(nro2)) {
+				sprintf_s(reloClicky, nro2);
 			}
 			else {
 				WriteChatf(PLUGIN_MSG "\arYou do not appear to have a Northern Desert Outlook Device.");
