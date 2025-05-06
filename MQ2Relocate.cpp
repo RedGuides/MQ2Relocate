@@ -828,7 +828,7 @@ inline bool InGame() {
 
 CAltAbilityData* AltAbility(const char* szAltName) {
 	for (int nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (CAltAbilityData* pAbility = GetAAById(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
+		if (CAltAbilityData* pAbility = GetAAById(pLocalPC->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (ci_equals(szAltName, pName)) {
 					return pAbility;
@@ -870,7 +870,7 @@ bool AltAbilityReady(const char* szLine, const unsigned long TargetID) {
 	}
 
 	for (auto nAbility = 0; nAbility < AA_CHAR_MAX_REAL; nAbility++) {
-		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pPCData->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
+		if (CAltAbilityData* pAbility = GetAAByIdWrapper(pLocalPC->GetAlternateAbilityId(nAbility), pLocalPlayer->Level)) {
 			if (const char* pName = pCDBStr->GetString(pAbility->nName, eAltAbilityName)) {
 				if (ci_equals(szLine, pName)) {
 					if (pAbility->SpellID != -1) {
@@ -880,7 +880,7 @@ bool AltAbilityReady(const char* szLine, const unsigned long TargetID) {
 								return false;
 							}
 							if (DiscReady(myAltAbility)) {
-								return pAltAdvManager->IsAbilityReady(pPCData, pAbility, 0);
+								return pAltAdvManager->IsAbilityReady(pLocalPC, pAbility, 0);
 							}
 						}
 					}
@@ -892,9 +892,9 @@ bool AltAbilityReady(const char* szLine, const unsigned long TargetID) {
 }
 
 int GroupSize() {
-	if (pCharData) {
-		if (pCharData->Group) {
-			return pCharData->Group->GetNumberOfMembers();
+	if (pLocalPC) {
+		if (pLocalPC->Group) {
+			return pLocalPC->Group->GetNumberOfMembers();
 		}
 	}
 	return 0;
@@ -979,7 +979,7 @@ bool DiscReady(EQ_Spell* pSpell) {
 
 	time_t timeNow = time(NULL);
 
-	if (pPCData->GetCombatAbilityTimer(pSpell->ReuseTimerIndex, pSpell->SpellGroup) < timeNow) {
+	if (pLocalPC->GetCombatAbilityTimer(pSpell->ReuseTimerIndex, pSpell->SpellGroup) < timeNow) {
 		return true;
 	}
 	return false;
